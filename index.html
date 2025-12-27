@@ -441,7 +441,11 @@
             if(document.getElementById('adm-key').value === "ShyuanQinn") {
                 isAdmin = true;
                 toggleModal('admin-modal', false);
-                alert("管理员授权成功");
+                alert("管理员授权成功，正在直接进入现场...");
+                // 管理员特权：直接进入内页
+                toggleView();
+            } else {
+                alert("关键词错误，请重新输入");
             }
         };
 
