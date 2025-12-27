@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026 马六甲跨年互动盛典 (AI Powered)</title>
-    <!-- 引入外部库：Tailwind CSS 用于 UI 渲染 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -17,7 +16,6 @@
             user-select: none;
         }
 
-        /* 极致烟花升空动画 */
         @keyframes rise {
             0% { transform: translateY(0) scaleX(0.5); opacity: 0; }
             5% { opacity: 0.8; }
@@ -26,7 +24,6 @@
             100% { transform: translateY(-75vh) scaleX(1); opacity: 0; }
         }
 
-        /* 文字爆炸动画 */
         @keyframes explode {
             0% { transform: scale(0); opacity: 0; filter: blur(30px); }
             5% { opacity: 1; filter: blur(0px); transform: scale(1.3); }
@@ -34,33 +31,9 @@
             100% { transform: scale(4); opacity: 0; filter: blur(50px); }
         }
 
-        /* 动态背景云层 */
-        @keyframes wind {
-            0% { transform: translateX(-100%) scale(1.5); }
-            100% { transform: translateX(100%) scale(1.5); }
-        }
+        .firework-text { animation: explode 2.5s 6s ease-out forwards; }
+        .firework-trail { animation: rise 8s ease-out forwards; }
 
-        /* 雨滴下落 */
-        @keyframes fall {
-            0% { transform: translateY(-100vh) skewX(-15deg); }
-            100% { transform: translateY(100vh) skewX(-15deg); }
-        }
-
-        /* 闪电 */
-        @keyframes strobe {
-            0%, 94%, 98%, 100% { opacity: 0; }
-            95%, 97%, 99% { opacity: 0.4; }
-        }
-
-        .firework-text {
-            animation: explode 2.5s 6s ease-out forwards;
-        }
-
-        .firework-trail {
-            animation: rise 8s ease-out forwards;
-        }
-
-        /* 自定义滚动条 */
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.3); border-radius: 10px; }
 
@@ -75,7 +48,6 @@
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
         }
 
-        /* 加载状态 */
         .loading-dots:after {
             content: '.';
             animation: dots 1.5s steps(5, end) infinite;
@@ -86,6 +58,10 @@
             60% { content: '...'; }
             80%, 100% { content: ''; }
         }
+
+        /* 验证步骤指示器 */
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.3s; }
+        .step-dot.active { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
     </style>
 </head>
 <body>
@@ -128,7 +104,6 @@
 
     <!-- ================= 内页: 主互动面板 ================= -->
     <div id="main-page" class="relative z-20 h-screen flex p-8 gap-8 hidden">
-        <!-- 左侧: 祝福墙 -->
         <div class="w-[35%] flex flex-col glass rounded-[40px] overflow-hidden shadow-2xl">
             <div class="p-8 bg-red-600 flex justify-between items-end">
                 <div>
@@ -140,7 +115,6 @@
             <div id="wish-list" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"></div>
         </div>
 
-        <!-- 中间: 视觉 -->
         <div class="w-[30%] flex flex-col items-center justify-between py-12 pointer-events-none">
             <div id="clock" class="glass px-10 py-4 rounded-full border border-yellow-500/30 text-4xl font-black font-mono text-yellow-400 shadow-2xl">00:00:00</div>
             <div class="opacity-20 flex flex-col items-center">
@@ -148,12 +122,10 @@
             </div>
         </div>
 
-        <!-- 右侧: 功能区 -->
         <div class="w-[35%] flex flex-col gap-8">
             <div class="glass p-10 rounded-[40px] border border-yellow-500/20 shadow-2xl">
                 <h3 class="text-3xl font-black italic mb-8">ENTERTAINMENT</h3>
                 <div class="grid grid-cols-2 gap-4" id="game-grid"></div>
-                <!-- AI 运势插板 -->
                 <div class="mt-6 p-4 bg-white/5 rounded-2xl border border-white/10">
                     <button onclick="generateAIHoroscope()" id="btn-ai-horoscope" class="w-full py-3 sparkle-button text-black font-black rounded-xl text-sm flex items-center justify-center gap-2">
                         ✨ 查看 2026 AI 运势
@@ -167,18 +139,15 @@
                     <span id="sync-indicator" class="w-2 h-2 bg-yellow-500 rounded-full animate-ping"></span>
                     <span class="w-2 h-2 bg-yellow-500 rounded-full animate-ping" style="animation-delay: 0.2s"></span>
                 </div>
-                <p id="sync-status-text" class="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Local Mode (No Firebase)</p>
+                <p id="sync-status-text" class="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Local Mode</p>
             </div>
         </div>
     </div>
 
-    <!-- ================= 弹窗集合 ================= -->
-    
-    <!-- AI 配置 (新添加，方便用户在没有环境变量时配置) -->
+    <!-- AI 配置弹窗 -->
     <div id="ai-config-modal" class="fixed inset-0 z-[120] glass flex items-center justify-center p-6 hidden">
         <div class="bg-indigo-900 p-8 rounded-[40px] w-full max-w-md border-2 border-indigo-400 shadow-2xl">
             <h2 class="text-2xl font-black text-indigo-300 mb-4 italic">Gemini API 配置</h2>
-            <p class="text-xs opacity-70 mb-6 leading-relaxed">请输入您的 Gemini API Key 以启用润色和运势功能。如果不配置，AI 功能将无法使用。</p>
             <input id="ai-api-key-input" type="password" placeholder="Paste your API Key here" class="w-full bg-black/40 border-2 border-indigo-700 rounded-xl px-4 py-3 text-sm focus:border-indigo-400 outline-none mb-6">
             <div class="flex gap-4">
                 <button onclick="toggleModal('ai-config-modal', false)" class="flex-1 font-bold">关闭</button>
@@ -187,7 +156,7 @@
         </div>
     </div>
 
-    <!-- 提交祝福 -->
+    <!-- 提交祝福弹窗 -->
     <div id="wish-modal" class="fixed inset-0 z-[100] glass flex items-center justify-center p-6 hidden">
         <div class="bg-red-600 w-full max-w-lg rounded-[50px] p-10 shadow-2xl border-4 border-yellow-400">
             <h2 class="text-4xl font-black text-center mb-8 italic text-yellow-300">SUBMIT WISH</h2>
@@ -207,140 +176,135 @@
         </div>
     </div>
 
-    <!-- 管理员 -->
+    <!-- 管理员三重验证弹窗 -->
     <div id="admin-modal" class="fixed inset-0 z-[110] glass flex items-center justify-center p-6 hidden">
         <div class="bg-slate-900 p-10 rounded-[40px] w-full max-w-md border-2 border-blue-500 shadow-2xl">
-            <h2 class="text-2xl font-black text-blue-400 mb-6 italic tracking-widest">ADMIN ACCESS</h2>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black text-blue-400 italic tracking-widest">IDENTITY CHECK</h2>
+                <!-- 进度指示器 -->
+                <div class="flex gap-2">
+                    <div id="step-1-dot" class="step-dot active"></div>
+                    <div id="step-2-dot" class="step-dot"></div>
+                    <div id="step-3-dot" class="step-dot"></div>
+                </div>
+            </div>
+
             <div class="space-y-4">
-                <input id="adm-key" type="password" placeholder="请输入暗语/暗号/密码" class="w-full bg-black/50 border-2 border-blue-900 rounded-xl px-5 py-3 text-sm focus:border-blue-400 outline-none">
-                <div class="flex flex-wrap gap-4 pt-6">
-                    <button id="btn-admin-close" onclick="toggleModal('admin-modal', false)" class="flex-1 text-slate-500 font-bold">关闭</button>
-                    <button id="btn-admin-login" class="flex-[2] py-3 bg-blue-600 rounded-xl font-black shadow-lg">验证</button>
+                <p id="admin-label" class="text-xs font-bold text-white/50 uppercase tracking-widest">Step 1: 请输入暗语 (Keyword)</p>
+                <input id="adm-key" type="password" placeholder="..." class="w-full bg-black/50 border-2 border-blue-900 rounded-xl px-5 py-3 text-sm focus:border-blue-400 outline-none">
+                
+                <div class="flex flex-wrap gap-4 pt-6" id="admin-actions">
+                    <button id="btn-admin-close" onclick="resetAdminFlow(); toggleModal('admin-modal', false);" class="flex-1 text-slate-500 font-bold">取消</button>
+                    <button id="btn-admin-next" onclick="processAdminStep()" class="flex-[2] py-3 bg-blue-600 rounded-xl font-black shadow-lg">下一步</button>
+                    
                     <!-- 验证成功后显示的快捷进入按钮 -->
-                    <button id="btn-quick-enter" onclick="toggleView(); toggleModal('admin-modal', false);" class="w-full py-4 bg-green-600 rounded-xl font-black shadow-lg hidden animate-bounce">🚀 直接进入现场</button>
+                    <button id="btn-quick-enter" onclick="toggleView(); toggleModal('admin-modal', false);" class="w-full py-4 bg-green-600 rounded-xl font-black shadow-lg hidden animate-bounce">🚀 验证完毕 · 直接进入现场</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase & 应用逻辑脚本 -->
     <script type="module">
-        // 注意：这里使用 CDN 动态导入 Firebase，增强独立运行能力
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- 环境配置与兜底机制 ---
         let firebaseConfig = null;
         let useFirebase = false;
         
-        // 尝试从 Canvas 环境或 window 获取配置
         try {
             if (typeof __firebase_config !== 'undefined') {
                 firebaseConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
                 useFirebase = true;
             }
-        } catch (e) { console.warn("Firebase config not found, switching to local storage mode."); }
+        } catch (e) {}
 
-        // --- AI 密钥管理 ---
-        // 默认尝试从 Canvas 获取，没有则为空
-        window.GEMINI_API_KEY = typeof apiKey !== 'undefined' ? apiKey : (localStorage.getItem('gemini_api_key') || "");
+        window.GEMINI_API_KEY = localStorage.getItem('gemini_api_key') || "";
 
         window.saveAIKey = () => {
             const val = document.getElementById('ai-api-key-input').value;
             if(val) {
                 window.GEMINI_API_KEY = val;
                 localStorage.setItem('gemini_api_key', val);
-                alert("API Key 已保存至本地缓存。");
                 toggleModal('ai-config-modal', false);
             }
         };
 
-        // --- 全局状态 ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'melaka-2026-stand-alone';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'melaka-2026';
         const PUBLIC_PATH = ['artifacts', appId, 'public', 'data'];
         let isAdmin = false;
 
-        // --- Gemini API 工具函数 ---
-        async function callGemini(prompt, systemPrompt = "") {
-            if (!window.GEMINI_API_KEY) {
-                alert("请先点击左下角机器人图标配置 Gemini API Key。");
-                return null;
-            }
-            
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${window.GEMINI_API_KEY}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            };
+        // 管理员三步验证逻辑
+        let adminStep = 1;
+        const ADMIN_FLOW = {
+            1: { label: "Step 1: 请输入暗语 (Keyword)", key: "ShyuanQinn" },
+            2: { label: "Step 2: 请输入暗号 (Secret Code)", key: "KADETJPJ2025" },
+            3: { label: "Step 3: 请输入密码 (Password)", key: "MoeStar!2025" }
+        };
 
-            // 指数退避重试机制
-            for (let i = 0; i < 5; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const result = await response.json();
-                    
-                    if (result.error) throw new Error(result.error.message);
-                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "抱歉，AI 暂时无法响应。";
-                } catch (err) {
-                    console.error(`Attempt ${i+1} failed:`, err);
-                    const delay = Math.pow(2, i) * 1000;
-                    await new Promise(r => setTimeout(r, delay));
+        window.resetAdminFlow = () => {
+            adminStep = 1;
+            isAdmin = false;
+            document.getElementById('admin-label').innerText = ADMIN_FLOW[1].label;
+            document.getElementById('adm-key').value = '';
+            document.getElementById('adm-key').classList.remove('hidden');
+            document.getElementById('btn-admin-next').classList.remove('hidden');
+            document.getElementById('btn-quick-enter').classList.add('hidden');
+            for(let i=1; i<=3; i++) document.getElementById(`step-${i}-dot`).className = `step-dot ${i===1?'active':''}`;
+        };
+
+        window.processAdminStep = () => {
+            const inputVal = document.getElementById('adm-key').value;
+            const targetKey = ADMIN_FLOW[adminStep].key;
+
+            if (inputVal === targetKey) {
+                if (adminStep < 3) {
+                    adminStep++;
+                    document.getElementById('admin-label').innerText = ADMIN_FLOW[adminStep].label;
+                    document.getElementById('adm-key').value = '';
+                    document.getElementById(`step-${adminStep}-dot`).classList.add('active');
+                } else {
+                    // 全部通过
+                    isAdmin = true;
+                    document.getElementById('admin-label').innerText = "Identity Verified (身份已确认)";
+                    document.getElementById('adm-key').classList.add('hidden');
+                    document.getElementById('btn-admin-next').classList.add('hidden');
+                    document.getElementById('btn-quick-enter').classList.remove('hidden');
                 }
+            } else {
+                alert("验证失败，请重新输入当前步骤内容。");
+                document.getElementById('adm-key').value = '';
             }
-            return "连接失败，请检查网络或 API Key 是否正确。";
+        };
+
+        async function callGemini(prompt, systemPrompt = "") {
+            if (!window.GEMINI_API_KEY) return null;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${window.GEMINI_API_KEY}`;
+            const payload = { contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const result = await response.json();
+            return result.candidates?.[0]?.content?.parts?.[0]?.text;
         }
 
-        // --- AI 业务逻辑 ---
         window.polishWish = async () => {
             const textArea = document.getElementById('form-wish');
-            const btn = document.getElementById('btn-ai-polish');
             const originalText = textArea.value.trim();
             if (!originalText) return;
-
-            btn.disabled = true;
-            btn.innerText = "✨ 润色中...";
-            
-            const sys = "你是一位极具文学素养的祝福语大师。请将用户的跨年祈愿润色得更具诗意、正式且充满希望，字数控制在50字以内。";
-            const res = await callGemini(`请润色：${originalText}`, sys);
-            
+            const res = await callGemini(`请润色：${originalText}`, "祝福语大师。");
             if (res) textArea.value = res.replace(/["“”]/g, '').trim();
-            btn.disabled = false;
-            btn.innerText = "✨ AI 润色";
         };
 
         window.generateAIHoroscope = async () => {
             const resultDiv = document.getElementById('ai-fortune-result');
-            const btn = document.getElementById('btn-ai-horoscope');
-            
-            btn.disabled = true;
-            btn.classList.add('loading-dots');
-            btn.innerText = "✨ 星象观测中";
-            
-            const res = await callGemini(
-                `现在时间 ${new Date().toLocaleString()}，请为用户生成一条简短、炫酷且充满正能量的 2026 跨年运势短评（40字内）。`,
-                "你是一个生活在2026年的未来派占星师。"
-            );
-            
-            if (res) {
-                resultDiv.innerText = res;
-                resultDiv.classList.remove('hidden');
-            }
-            btn.disabled = false;
-            btn.classList.remove('loading-dots');
-            btn.innerText = "✨ 重新观测运势";
+            const res = await callGemini(`生成2026跨年运势短评。`, "未来占星师。");
+            if (res) { resultDiv.innerText = res; resultDiv.classList.remove('hidden'); }
         };
 
-        // --- 数据存储管理 (本地/Firebase) ---
         const handleWishesUpdate = (wishes) => {
             wishes.sort((a,b) => b.timestamp - a.timestamp);
             document.getElementById('wish-count').innerText = wishes.length;
             document.getElementById('wish-list').innerHTML = wishes.map(w => `
-                <div class="bg-white/5 p-6 rounded-3xl border border-white/5 hover:border-yellow-500/30 transition-all">
+                <div class="bg-white/5 p-6 rounded-3xl border border-white/5 hover:border-yellow-500/30">
                     <div class="flex justify-between text-xs font-bold mb-3">
                         <span class="text-yellow-400">@${w.nickname}</span>
                         <span class="opacity-30">${w.timeLabel}</span>
@@ -350,32 +314,14 @@
             `).join('');
         };
 
-        const saveWish = async (wishData) => {
-            if (useFirebase) {
-                const db = getFirestore();
-                await addDoc(collection(db, ...PUBLIC_PATH, 'wishes'), wishData);
-            } else {
-                const existing = JSON.parse(localStorage.getItem('local_wishes') || '[]');
-                existing.push(wishData);
-                localStorage.setItem('local_wishes', JSON.stringify(existing));
-                handleWishesUpdate(existing);
-            }
-        };
-
-        // --- 核心初始化 ---
         const initialize = async () => {
             if (useFirebase && firebaseConfig) {
                 const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
                 const db = getFirestore(app);
-
-                document.getElementById('sync-status-text').innerText = "Cloud Sync Active";
-                document.getElementById('sync-indicator').classList.replace('bg-yellow-500', 'bg-green-500');
-
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else { await signInAnonymously(auth); }
-
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         onSnapshot(collection(db, ...PUBLIC_PATH, 'wishes'), (snap) => {
@@ -384,53 +330,29 @@
                     }
                 });
             } else {
-                // 本地模式初始化
-                const localData = JSON.parse(localStorage.getItem('local_wishes') || '[]');
-                handleWishesUpdate(localData);
+                handleWishesUpdate(JSON.parse(localStorage.getItem('local_wishes') || '[]'));
             }
         };
 
-        // --- 倒计时与天气核心 ---
         const getMLKTime = () => new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (3600000 * 8));
         const format = (date) => date.toLocaleTimeString('en-GB', { hour12: false });
 
         const updateUI = () => {
             const now = getMLKTime();
-            const hour = now.getHours();
-            const sky = document.getElementById('sky');
             const target = new Date(2026, 0, 1, 0, 0, 0);
             const diff = target - now;
-
-            // 背景昼夜渐变
-            if (hour >= 6 && hour < 17) sky.className = "fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-cyan-400 via-blue-500 to-indigo-600";
-            else if (hour >= 17 && hour < 19) sky.className = "fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-orange-600 via-pink-600 to-purple-950";
-            else sky.className = "fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-slate-950 via-indigo-950 to-black";
-
             document.getElementById('clock').innerText = format(now);
-            
-            // 倒计时
             if (diff <= 0) {
                 document.getElementById('countdown-timer').innerText = "HAPPY NEW YEAR!";
             } else {
-                const d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
+                const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
                 document.getElementById('countdown-timer').innerText = `${String(d).padStart(2,'0')}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
             }
-
             const canEnter = isAdmin || (now.getMonth() === 11 && now.getDate() === 31 && now.getHours() >= 23);
-            document.getElementById('entrance-hint').innerText = canEnter ? "✨ 入口已开放，进入现场" : `当前: ${format(now)} (23:00 开放)`;
+            document.getElementById('entrance-hint').innerText = canEnter ? "✨ 入口已开放" : `当前: ${format(now)} (23:00 开放)`;
         };
 
-        // --- 交互处理 ---
-        window.toggleModal = (id, show) => {
-            document.getElementById(id).classList.toggle('hidden', !show);
-            // 每次关闭管理员弹窗时，重置快捷进入按钮的状态
-            if (id === 'admin-modal' && !show) {
-                document.getElementById('btn-quick-enter').classList.add('hidden');
-                document.getElementById('btn-admin-login').classList.remove('hidden');
-                document.getElementById('adm-key').value = '';
-            }
-        };
-
+        window.toggleModal = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
         window.toggleView = () => {
             document.getElementById('landing-page').classList.add('hidden');
             document.getElementById('main-page').classList.remove('hidden');
@@ -438,41 +360,21 @@
 
         document.getElementById('btn-submit').onclick = async () => {
             const name = document.getElementById('form-name').value;
-            const wish = document.getElementById('form-wish').value;
-            if(!name || !wish) return alert("内容不能为空");
-            
-            await saveWish({
-                nickname: name, wish: wish, timestamp: Date.now(), timeLabel: format(getMLKTime())
-            });
-            toggleModal('wish-modal', false);
-            toggleView();
-        };
-
-        document.getElementById('btn-admin-login').onclick = () => {
-            const key = document.getElementById('adm-key').value;
-            const validKeys = ["ShyuanQinn", "KADETJPJ2025", "MoeStar!2025"];
-            
-            if(validKeys.includes(key)) {
-                isAdmin = true;
-                // 验证成功后的 UI 变换
-                document.getElementById('btn-admin-login').classList.add('hidden');
-                document.getElementById('btn-quick-enter').classList.remove('hidden');
-                alert("授权成功！您现在可以点击绿色按钮直接进入内页，或关闭窗口正常填写祝福。");
-            } else {
-                alert("关键词无效，请核对后输入。");
+            const wishText = document.getElementById('form-wish').value;
+            const data = { nickname: name, wish: wishText, timestamp: Date.now(), timeLabel: format(getMLKTime()) };
+            if (useFirebase) { await addDoc(collection(getFirestore(), ...PUBLIC_PATH, 'wishes'), data); } 
+            else { 
+                const local = JSON.parse(localStorage.getItem('local_wishes') || '[]');
+                local.push(data);
+                localStorage.setItem('local_wishes', JSON.stringify(local));
+                handleWishesUpdate(local);
             }
+            toggleModal('wish-modal', false); toggleView();
         };
 
-        // 娱乐菜单初始化
-        document.getElementById('game-grid').innerHTML = [
-            { name: '方块', icon: '🧱', color: 'bg-blue-600' },
-            { name: '拼图', icon: '🧩', color: 'bg-teal-600' },
-            { name: '灯谜', icon: '🏮', color: 'bg-rose-600' },
-            { name: '红包', icon: '🧧', color: 'bg-orange-600' },
-        ].map(g => `
-            <button class="${g.color} p-5 rounded-2xl flex flex-col items-center gap-2 hover:scale-105 transition-all active:scale-95 shadow-lg">
-                <span class="text-3xl">${g.icon}</span>
-                <span class="text-[10px] font-black">${g.name}</span>
+        document.getElementById('game-grid').innerHTML = ['🧱','🧩','🏮','🧧'].map(icon => `
+            <button class="bg-white/5 p-5 rounded-2xl flex flex-col items-center gap-2 hover:scale-105 transition-all">
+                <span class="text-3xl">${icon}</span>
             </button>
         `).join('');
 
