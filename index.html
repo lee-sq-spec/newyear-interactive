@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026 马六甲跨年互动盛典 (AI Powered)</title>
-    <!-- 引入 Tailwind CSS 驱动视觉 -->
+    <!-- 引入外部库：Tailwind CSS 用于 UI 渲染 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -120,7 +120,10 @@
             </div>
         </div>
 
-        <button onclick="toggleModal('admin-modal', true)" class="w-12 h-12 glass rounded-full flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity">🔑</button>
+        <div class="flex gap-4">
+            <button onclick="toggleModal('admin-modal', true)" class="w-12 h-12 glass rounded-full flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity">🔑</button>
+            <button onclick="toggleModal('ai-config-modal', true)" class="w-12 h-12 glass rounded-full flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity">🤖</button>
+        </div>
     </div>
 
     <!-- ================= 内页: 主互动面板 ================= -->
@@ -161,16 +164,29 @@
 
             <div class="mt-auto glass p-8 rounded-[30px] text-center">
                 <div class="flex justify-center gap-2 mb-4">
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-ping" style="animation-delay: 0.2s"></span>
+                    <span id="sync-indicator" class="w-2 h-2 bg-yellow-500 rounded-full animate-ping"></span>
+                    <span class="w-2 h-2 bg-yellow-500 rounded-full animate-ping" style="animation-delay: 0.2s"></span>
                 </div>
-                <p class="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Data Sync & AI Active</p>
+                <p id="sync-status-text" class="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Local Mode (No Firebase)</p>
             </div>
         </div>
     </div>
 
     <!-- ================= 弹窗集合 ================= -->
     
+    <!-- AI 配置 (新添加，方便用户在没有环境变量时配置) -->
+    <div id="ai-config-modal" class="fixed inset-0 z-[120] glass flex items-center justify-center p-6 hidden">
+        <div class="bg-indigo-900 p-8 rounded-[40px] w-full max-w-md border-2 border-indigo-400 shadow-2xl">
+            <h2 class="text-2xl font-black text-indigo-300 mb-4 italic">Gemini API 配置</h2>
+            <p class="text-xs opacity-70 mb-6 leading-relaxed">请输入您的 Gemini API Key 以启用润色和运势功能。如果不配置，AI 功能将无法使用。</p>
+            <input id="ai-api-key-input" type="password" placeholder="Paste your API Key here" class="w-full bg-black/40 border-2 border-indigo-700 rounded-xl px-4 py-3 text-sm focus:border-indigo-400 outline-none mb-6">
+            <div class="flex gap-4">
+                <button onclick="toggleModal('ai-config-modal', false)" class="flex-1 font-bold">关闭</button>
+                <button onclick="saveAIKey()" class="flex-1 py-3 bg-indigo-500 rounded-xl font-black">保存配置</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 提交祝福 -->
     <div id="wish-modal" class="fixed inset-0 z-[100] glass flex items-center justify-center p-6 hidden">
         <div class="bg-red-600 w-full max-w-lg rounded-[50px] p-10 shadow-2xl border-4 border-yellow-400">
@@ -205,38 +221,58 @@
         </div>
     </div>
 
-    <!-- Firebase & Gemini SDK -->
+    <!-- Firebase & 应用逻辑脚本 -->
     <script type="module">
+        // 注意：这里使用 CDN 动态导入 Firebase，增强独立运行能力
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, addDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- 环境配置 ---
-        let firebaseConfig = {};
+        // --- 环境配置与兜底机制 ---
+        let firebaseConfig = null;
+        let useFirebase = false;
+        
+        // 尝试从 Canvas 环境或 window 获取配置
         try {
             if (typeof __firebase_config !== 'undefined') {
                 firebaseConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
+                useFirebase = true;
             }
-        } catch (e) { console.error("Firebase Config Error", e); }
+        } catch (e) { console.warn("Firebase config not found, switching to local storage mode."); }
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'melaka-2026';
+        // --- AI 密钥管理 ---
+        // 默认尝试从 Canvas 获取，没有则为空
+        window.GEMINI_API_KEY = typeof apiKey !== 'undefined' ? apiKey : (localStorage.getItem('gemini_api_key') || "");
+
+        window.saveAIKey = () => {
+            const val = document.getElementById('ai-api-key-input').value;
+            if(val) {
+                window.GEMINI_API_KEY = val;
+                localStorage.setItem('gemini_api_key', val);
+                alert("API Key 已保存至本地缓存。");
+                toggleModal('ai-config-modal', false);
+            }
+        };
+
+        // --- 全局状态 ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'melaka-2026-stand-alone';
         const PUBLIC_PATH = ['artifacts', appId, 'public', 'data'];
-        
-        const apiKey = ""; // Canvas 运行时会自动提供
-        let currentUser = null;
         let isAdmin = false;
 
         // --- Gemini API 工具函数 ---
         async function callGemini(prompt, systemPrompt = "") {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            if (!window.GEMINI_API_KEY) {
+                alert("请先点击左下角机器人图标配置 Gemini API Key。");
+                return null;
+            }
+            
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${window.GEMINI_API_KEY}`;
             const payload = {
                 contents: [{ parts: [{ text: prompt }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] }
             };
 
+            // 指数退避重试机制
             for (let i = 0; i < 5; i++) {
                 try {
                     const response = await fetch(url, {
@@ -245,29 +281,32 @@
                         body: JSON.stringify(payload)
                     });
                     const result = await response.json();
+                    
+                    if (result.error) throw new Error(result.error.message);
                     return result.candidates?.[0]?.content?.parts?.[0]?.text || "抱歉，AI 暂时无法响应。";
                 } catch (err) {
+                    console.error(`Attempt ${i+1} failed:`, err);
                     const delay = Math.pow(2, i) * 1000;
                     await new Promise(r => setTimeout(r, delay));
                 }
             }
-            return "连接失败，请稍后再试。";
+            return "连接失败，请检查网络或 API Key 是否正确。";
         }
 
-        // --- AI 功能实现 ---
+        // --- AI 业务逻辑 ---
         window.polishWish = async () => {
             const textArea = document.getElementById('form-wish');
             const btn = document.getElementById('btn-ai-polish');
             const originalText = textArea.value.trim();
-            if (!originalText) return alert("请先输入一些文字。");
+            if (!originalText) return;
 
             btn.disabled = true;
             btn.innerText = "✨ 润色中...";
             
-            const systemPrompt = "你是一位极具文学素养的祝福语大师。请将用户的跨年祈愿润色得更具诗意、正式且充满希望，字数控制在50字以内。保持真诚。";
-            const polished = await callGemini(`请润色这段跨年愿望：${originalText}`, systemPrompt);
+            const sys = "你是一位极具文学素养的祝福语大师。请将用户的跨年祈愿润色得更具诗意、正式且充满希望，字数控制在50字以内。";
+            const res = await callGemini(`请润色：${originalText}`, sys);
             
-            textArea.value = polished.replace(/["“”]/g, '').trim();
+            if (res) textArea.value = res.replace(/["“”]/g, '').trim();
             btn.disabled = false;
             btn.innerText = "✨ AI 润色";
         };
@@ -280,87 +319,106 @@
             btn.classList.add('loading-dots');
             btn.innerText = "✨ 星象观测中";
             
-            const prompt = `现在是马六甲时间 ${new Date().toLocaleString()}，作为一名赛博占星师，请为用户生成一条简短、炫酷且充满正能量的 2026 跨年运势短评（约40字）。`;
-            const fortune = await callGemini(prompt, "你是一个生活在2026年的未来派占星师，语气神秘且充满科幻感。");
+            const res = await callGemini(
+                `现在时间 ${new Date().toLocaleString()}，请为用户生成一条简短、炫酷且充满正能量的 2026 跨年运势短评（40字内）。`,
+                "你是一个生活在2026年的未来派占星师。"
+            );
             
-            resultDiv.innerText = fortune;
-            resultDiv.classList.remove('hidden');
+            if (res) {
+                resultDiv.innerText = res;
+                resultDiv.classList.remove('hidden');
+            }
             btn.disabled = false;
             btn.classList.remove('loading-dots');
             btn.innerText = "✨ 重新观测运势";
         };
 
-        // --- 核心倒计时与天气逻辑 ---
-        const getMLKTime = () => new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (3600000 * 8));
-        const format = (date) => date.toLocaleTimeString('en-GB', { hour12: false });
-
-        const updateWeather = (time) => {
-            const hour = time.getHours();
-            const sky = document.getElementById('sky');
-            const celestial = document.getElementById('celestial');
-            
-            if (hour >= 6 && hour < 17) sky.className = "fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-cyan-400 via-blue-500 to-indigo-600";
-            else if (hour >= 17 && hour < 19) sky.className = "fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-orange-600 via-pink-600 to-purple-950";
-            else sky.className = "fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-slate-950 via-indigo-950 to-black";
-
-            celestial.innerHTML = (hour >= 6 && hour < 18) ? "☀️" : "🌙";
-            celestial.style.opacity = "1";
-            celestial.style.transform = "translateY(0)";
-        };
-
-        const updateCountdown = () => {
-            const now = getMLKTime();
-            const target = new Date(2026, 0, 1, 0, 0, 0);
-            const diff = target - now;
-            updateWeather(now);
-            document.getElementById('clock').innerText = format(now);
-            
-            if (diff <= 0) {
-                document.getElementById('countdown-timer').innerText = "HAPPY NEW YEAR!";
-            } else {
-                const d = Math.floor(diff / 86400000);
-                const h = Math.floor((diff % 86400000) / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-                document.getElementById('countdown-timer').innerText = `${String(d).padStart(2,'0')}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            }
-            const canEnter = isAdmin || (now.getMonth() === 11 && now.getDate() === 31 && now.getHours() >= 23);
-            document.getElementById('entrance-hint').innerText = canEnter ? "✨ 入口已开放，进入现场" : `当前: ${format(now)} (23:00 开放)`;
-        };
-
-        // --- 数据同步 ---
-        const startDataSync = () => {
-            onSnapshot(collection(db, ...PUBLIC_PATH, 'wishes'), (snap) => {
-                const wishes = snap.docs.map(d => d.data()).sort((a,b) => b.timestamp - a.timestamp);
-                document.getElementById('wish-count').innerText = wishes.length;
-                document.getElementById('wish-list').innerHTML = wishes.map(w => `
-                    <div class="bg-white/5 p-6 rounded-3xl border border-white/5 hover:border-yellow-500/30 transition-all">
-                        <div class="flex justify-between text-xs font-bold mb-3">
-                            <span class="text-yellow-400">@${w.nickname}</span>
-                            <span class="opacity-30">${w.timeLabel}</span>
-                        </div>
-                        <p class="text-lg font-bold">${w.wish}</p>
+        // --- 数据存储管理 (本地/Firebase) ---
+        const handleWishesUpdate = (wishes) => {
+            wishes.sort((a,b) => b.timestamp - a.timestamp);
+            document.getElementById('wish-count').innerText = wishes.length;
+            document.getElementById('wish-list').innerHTML = wishes.map(w => `
+                <div class="bg-white/5 p-6 rounded-3xl border border-white/5 hover:border-yellow-500/30 transition-all">
+                    <div class="flex justify-between text-xs font-bold mb-3">
+                        <span class="text-yellow-400">@${w.nickname}</span>
+                        <span class="opacity-30">${w.timeLabel}</span>
                     </div>
-                `).join('');
-            });
+                    <p class="text-lg font-bold">${w.wish}</p>
+                </div>
+            `).join('');
         };
 
+        const saveWish = async (wishData) => {
+            if (useFirebase) {
+                const db = getFirestore();
+                await addDoc(collection(db, ...PUBLIC_PATH, 'wishes'), wishData);
+            } else {
+                const existing = JSON.parse(localStorage.getItem('local_wishes') || '[]');
+                existing.push(wishData);
+                localStorage.setItem('local_wishes', JSON.stringify(existing));
+                handleWishesUpdate(existing);
+            }
+        };
+
+        // --- 核心初始化 ---
         const initialize = async () => {
-            try {
+            if (useFirebase && firebaseConfig) {
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+
+                document.getElementById('sync-status-text').innerText = "Cloud Sync Active";
+                document.getElementById('sync-indicator').classList.replace('bg-yellow-500', 'bg-green-500');
+
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else { await signInAnonymously(auth); }
 
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        currentUser = user;
-                        startDataSync();
+                        onSnapshot(collection(db, ...PUBLIC_PATH, 'wishes'), (snap) => {
+                            handleWishesUpdate(snap.docs.map(d => d.data()));
+                        });
                     }
                 });
-            } catch (err) { console.error("Auth Failed", err); }
+            } else {
+                // 本地模式初始化
+                const localData = JSON.parse(localStorage.getItem('local_wishes') || '[]');
+                handleWishesUpdate(localData);
+            }
         };
 
-        // --- 事件绑定 ---
+        // --- 倒计时与天气核心 ---
+        const getMLKTime = () => new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (3600000 * 8));
+        const format = (date) => date.toLocaleTimeString('en-GB', { hour12: false });
+
+        const updateUI = () => {
+            const now = getMLKTime();
+            const hour = now.getHours();
+            const sky = document.getElementById('sky');
+            const target = new Date(2026, 0, 1, 0, 0, 0);
+            const diff = target - now;
+
+            // 背景昼夜渐变
+            if (hour >= 6 && hour < 17) sky.className = "fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-cyan-400 via-blue-500 to-indigo-600";
+            else if (hour >= 17 && hour < 19) sky.className = "fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-orange-600 via-pink-600 to-purple-950";
+            else sky.className = "fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-slate-950 via-indigo-950 to-black";
+
+            document.getElementById('clock').innerText = format(now);
+            
+            // 倒计时
+            if (diff <= 0) {
+                document.getElementById('countdown-timer').innerText = "HAPPY NEW YEAR!";
+            } else {
+                const d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('countdown-timer').innerText = `${String(d).padStart(2,'0')}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            }
+
+            const canEnter = isAdmin || (now.getMonth() === 11 && now.getDate() === 31 && now.getHours() >= 23);
+            document.getElementById('entrance-hint').innerText = canEnter ? "✨ 入口已开放，进入现场" : `当前: ${format(now)} (23:00 开放)`;
+        };
+
+        // --- 交互处理 ---
         window.toggleModal = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
         window.toggleView = () => {
             document.getElementById('landing-page').classList.add('hidden');
@@ -372,39 +430,35 @@
             const wish = document.getElementById('form-wish').value;
             if(!name || !wish) return alert("内容不能为空");
             
-            try {
-                await addDoc(collection(db, ...PUBLIC_PATH, 'wishes'), {
-                    nickname: name, wish: wish, timestamp: Date.now(), timeLabel: format(getMLKTime())
-                });
-                toggleModal('wish-modal', false);
-                toggleView();
-            } catch (err) { console.error(err); }
+            await saveWish({
+                nickname: name, wish: wish, timestamp: Date.now(), timeLabel: format(getMLKTime())
+            });
+            toggleModal('wish-modal', false);
+            toggleView();
         };
 
         document.getElementById('btn-admin-login').onclick = () => {
-            const k = document.getElementById('adm-key').value;
-            if(k === "ShyuanQinn") {
+            if(document.getElementById('adm-key').value === "ShyuanQinn") {
                 isAdmin = true;
                 toggleModal('admin-modal', false);
-                alert("管理员登录成功");
+                alert("管理员授权成功");
             }
         };
 
-        // 初始化 UI
-        const games = [
+        // 娱乐菜单初始化
+        document.getElementById('game-grid').innerHTML = [
             { name: '方块', icon: '🧱', color: 'bg-blue-600' },
             { name: '拼图', icon: '🧩', color: 'bg-teal-600' },
             { name: '灯谜', icon: '🏮', color: 'bg-rose-600' },
             { name: '红包', icon: '🧧', color: 'bg-orange-600' },
-        ];
-        document.getElementById('game-grid').innerHTML = games.map(g => `
+        ].map(g => `
             <button class="${g.color} p-5 rounded-2xl flex flex-col items-center gap-2 hover:scale-105 transition-all active:scale-95 shadow-lg">
                 <span class="text-3xl">${g.icon}</span>
                 <span class="text-[10px] font-black">${g.name}</span>
             </button>
         `).join('');
 
-        setInterval(updateCountdown, 1000);
+        setInterval(updateUI, 1000);
         initialize();
     </script>
 </body>
