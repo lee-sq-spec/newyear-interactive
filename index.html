@@ -212,10 +212,12 @@
         <div class="bg-slate-900 p-10 rounded-[40px] w-full max-w-md border-2 border-blue-500 shadow-2xl">
             <h2 class="text-2xl font-black text-blue-400 mb-6 italic tracking-widest">ADMIN ACCESS</h2>
             <div class="space-y-4">
-                <input id="adm-key" type="password" placeholder="KEYWORD" class="w-full bg-black/50 border-2 border-blue-900 rounded-xl px-5 py-3 text-sm focus:border-blue-400 outline-none">
-                <div class="flex gap-4 pt-6">
-                    <button onclick="toggleModal('admin-modal', false)" class="flex-1 text-slate-500 font-bold">关闭</button>
+                <input id="adm-key" type="password" placeholder="请输入暗语/暗号/密码" class="w-full bg-black/50 border-2 border-blue-900 rounded-xl px-5 py-3 text-sm focus:border-blue-400 outline-none">
+                <div class="flex flex-wrap gap-4 pt-6">
+                    <button id="btn-admin-close" onclick="toggleModal('admin-modal', false)" class="flex-1 text-slate-500 font-bold">关闭</button>
                     <button id="btn-admin-login" class="flex-[2] py-3 bg-blue-600 rounded-xl font-black shadow-lg">验证</button>
+                    <!-- 验证成功后显示的快捷进入按钮 -->
+                    <button id="btn-quick-enter" onclick="toggleView(); toggleModal('admin-modal', false);" class="w-full py-4 bg-green-600 rounded-xl font-black shadow-lg hidden animate-bounce">🚀 直接进入现场</button>
                 </div>
             </div>
         </div>
@@ -419,7 +421,16 @@
         };
 
         // --- 交互处理 ---
-        window.toggleModal = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
+        window.toggleModal = (id, show) => {
+            document.getElementById(id).classList.toggle('hidden', !show);
+            // 每次关闭管理员弹窗时，重置快捷进入按钮的状态
+            if (id === 'admin-modal' && !show) {
+                document.getElementById('btn-quick-enter').classList.add('hidden');
+                document.getElementById('btn-admin-login').classList.remove('hidden');
+                document.getElementById('adm-key').value = '';
+            }
+        };
+
         window.toggleView = () => {
             document.getElementById('landing-page').classList.add('hidden');
             document.getElementById('main-page').classList.remove('hidden');
@@ -438,14 +449,17 @@
         };
 
         document.getElementById('btn-admin-login').onclick = () => {
-            if(document.getElementById('adm-key').value === "ShyuanQinn") {
+            const key = document.getElementById('adm-key').value;
+            const validKeys = ["ShyuanQinn", "KADETJPJ2025", "MoeStar!2025"];
+            
+            if(validKeys.includes(key)) {
                 isAdmin = true;
-                toggleModal('admin-modal', false);
-                alert("管理员授权成功，正在直接进入现场...");
-                // 管理员特权：直接进入内页
-                toggleView();
+                // 验证成功后的 UI 变换
+                document.getElementById('btn-admin-login').classList.add('hidden');
+                document.getElementById('btn-quick-enter').classList.remove('hidden');
+                alert("授权成功！您现在可以点击绿色按钮直接进入内页，或关闭窗口正常填写祝福。");
             } else {
-                alert("关键词错误，请重新输入");
+                alert("关键词无效，请核对后输入。");
             }
         };
 
