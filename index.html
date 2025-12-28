@@ -3,383 +3,4194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 马六甲跨年互动盛典 (AI Powered)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>2026跨年互动网页 | 马六甲时间</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        :root {
+            --welcome-primary: #E6002D;
+            --welcome-accent: #FFD700;
+            --main-primary: #FF3B1F;
+            --main-accent: #FFC857;
+            --text-white: #FFFFFF;
+            --text-light: #FFF8E1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000;
-            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 30%, #2a2a6a 70%, #3a3a8a 100%);
+        }
+        
+        /* 动态壁纸Canvas */
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+        
+        /* 烟花Canvas */
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* 外页 */
+        #welcome-page {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 40px 20px;
+            color: var(--text-white);
+            transition: opacity 0.5s ease;
+        }
+        
+        .header-zone {
+            width: 100%;
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        .main-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: var(--welcome-accent);
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.7);
+        }
+        
+        .central-zone {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .welcome-message {
+            font-size: 20px;
+            line-height: 1.6;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            max-width: 700px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, var(--welcome-primary), #FF3366);
+            color: var(--text-white);
+            border: none;
+            border-radius: 12px;
+            width: 220px;
+            height: 60px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(230, 0, 45, 0.4);
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(230, 0, 45, 0.6);
+        }
+        
+        .primary-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .countdown-container {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            text-align: center;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid var(--welcome-accent);
+            backdrop-filter: blur(10px);
+        }
+        
+        .melaka-time {
+            font-size: 18px;
+            color: var(--welcome-accent);
+            margin-bottom: 5px;
+        }
+        
+        .countdown {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--welcome-accent);
+            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+        }
+        
+        .footer-zone {
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .admin-btn {
+            position: absolute;
+            right: 30px;
+            bottom: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(51, 51, 51, 0.8);
+            border: 2px solid var(--welcome-accent);
+            color: var(--welcome-accent);
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .admin-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        /* 内页 */
+        #main-page {
+            display: none;
+            min-height: 100vh;
+            color: var(--text-white);
+            transition: opacity 0.5s ease;
+        }
+        
+        #main-content {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            border: 2px solid var(--main-accent);
+            backdrop-filter: blur(10px);
+        }
+        
+        .main-countdown {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--main-accent);
+            text-shadow: 0 2px 10px rgba(255, 200, 87, 0.3);
+        }
+        
+        .content-area {
+            display: flex;
+            flex: 1;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .content-area {
+                flex-direction: column;
+            }
+        }
+        
+        .left-zone, .center-zone, .right-zone {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 25px;
+            border: 2px solid var(--main-accent);
+            backdrop-filter: blur(10px);
+        }
+        
+        .left-zone {
+            flex: 4;
+        }
+        
+        .center-zone {
+            flex: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .right-zone {
+            flex: 4;
+        }
+        
+        .zone-title {
+            font-size: 28px;
+            color: var(--main-accent);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--main-accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .game-btn {
+            background: linear-gradient(135deg, var(--main-primary), #FF6B35);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 25px 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+            box-shadow: 0 8px 20px rgba(255, 59, 31, 0.3);
+        }
+        
+        .game-btn i {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+        
+        .game-btn:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(255, 59, 31, 0.5);
+        }
+        
+        .blessing-wall {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .blessing-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--main-accent);
+            transition: all 0.3s ease;
+        }
+        
+        .blessing-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .blessing-name {
+            font-weight: 700;
+            color: var(--main-accent);
+            font-size: 16px;
+        }
+        
+        .main-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            border: 2px solid var(--main-accent);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* 弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 3px solid var(--welcome-primary);
+        }
+        
+        .modal-header {
+            font-size: 28px;
+            color: var(--welcome-accent);
+            margin-bottom: 25px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--welcome-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--welcome-primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(230, 0, 45, 0.1);
+        }
+        
+        /* 优化祝福语框 - 适配电脑和手机 */
+        textarea.form-control {
+            min-height: 100px;
+            max-height: 150px;
+            resize: vertical;
+            overflow-y: auto;
+        }
+        
+        /* 移动设备优化 */
+        @media (max-width: 768px) {
+            textarea.form-control {
+                min-height: 80px;
+                max-height: 120px;
+                font-size: 14px;
+            }
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .modal-btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, var(--welcome-primary), #FF3366);
+            color: white;
+            box-shadow: 0 5px 15px rgba(230, 0, 45, 0.3);
+        }
+        
+        .close-btn {
+            background: linear-gradient(135deg, #666, #888);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 时间限制提示 */
+        .time-restriction-notice {
+            margin-top: 25px;
+            color: #FFCC00;
+            font-size: 18px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            max-width: 600px;
+            text-align: center;
+            line-height: 1.5;
+        }
+        
+        .time-restriction-notice i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        /* 祝福按钮状态 */
+        .blessing-btn-disabled {
+            background: #666;
+            cursor: not-allowed;
+            position: relative;
+        }
+        
+        .blessing-btn-disabled:hover {
+            transform: none;
+            box-shadow: 0 6px 20px rgba(230, 0, 45, 0.4);
+        }
+        
+        .blessing-btn-disabled::after {
+            content: "⏰ 23:00后开放";
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #FFD700;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .blessing-btn-disabled:hover::after {
+            opacity: 1;
+        }
+        
+        /* 游戏弹窗 */
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .game-modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 25px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            border: 3px solid var(--main-primary);
+            overflow-y: auto;
+        }
+        
+        .game-title {
+            font-size: 26px;
+            color: var(--main-accent);
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--main-primary);
+        }
+        
+        .game-area {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        
+        .close-game-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 30px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-game-btn:hover {
+            color: var(--main-primary);
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+        
+        /* 消息提示 */
+        .message-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 26, 46, 0.95);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 20px;
+            font-size: 22px;
+            z-index: 2000;
+            display: none;
+            text-align: center;
+            border: 3px solid var(--main-accent);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            min-width: 300px;
+        }
+        
+        /* 在线人数样式 */
+        .online-badge {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(78, 205, 196, 0.3);
+        }
+        
+        .online-badge strong {
+            font-size: 20px;
+            margin-left: 5px;
+        }
+        
+        /* 动画效果 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* 游戏图标颜色 */
+        .game-btn:nth-child(1) { background: linear-gradient(135deg, #FF3B1F, #FF6B35); }
+        .game-btn:nth-child(2) { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+        .game-btn:nth-child(3) { background: linear-gradient(135deg, #FFC857, #FFB347); }
+        .game-btn:nth-child(4) { background: linear-gradient(135deg, #45B7D1, #3CA0C2); }
+        .game-btn:nth-child(5) { background: linear-gradient(135deg, #E6002D, #FF3366); }
+        .game-btn:nth-child(6) { background: linear-gradient(135deg, #96CEB4, #7DBF9E); }
+        
+        /* 游戏相关样式 */
+        #game-instructions {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 16px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        
+        #game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .game-control-btn {
+            background: linear-gradient(135deg, var(--main-primary), #FF6B35);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .game-control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 59, 31, 0.3);
+        }
+        
+        #game-score {
+            text-align: center;
+            font-size: 20px;
+            color: #FFFF00;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        
+        #game-canvas {
+            display: block;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 2px solid var(--main-accent);
+        }
+        
+        /* 游戏特定样式 */
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 5px;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        
+        .puzzle-piece {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--main-accent);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--main-accent);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .puzzle-piece:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .riddle-container {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .riddle-question {
+            font-size: 20px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .riddle-answer {
+            width: 80%;
+            padding: 15px;
+            margin: 10px auto;
+            border: 2px solid var(--main-accent);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            font-size: 18px;
+            text-align: center;
+        }
+        
+        .riddle-feedback {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 5px;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        
+        .number-cell {
+            background: linear-gradient(135deg, rgba(255, 51, 51, 0.8), rgba(255, 102, 0, 0.8));
+            border: 1px solid var(--main-accent);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #FFD700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .number-cell.active {
+            background: linear-gradient(135deg, var(--main-accent), #FFB347);
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .number-cell.connected {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 10px;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto;
+        }
+        
+        .memory-card {
+            background: linear-gradient(135deg, #2a2a6a, #3a3a8a);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .memory-card.flipped {
+            background: linear-gradient(135deg, var(--main-accent), #FFB347);
+            color: #000;
+            transform: rotateY(180deg);
+        }
+        
+        .memory-card.matched {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: #000;
+            cursor: default;
+        }
+        
+        .redpacket-container {
+            position: relative;
+            width: 400px;
+            height: 500px;
+            margin: 0 auto;
             overflow: hidden;
-            user-select: none;
+            border-radius: 15px;
+            background: rgba(255, 68, 68, 0.1);
+            border: 2px solid #FF4444;
         }
-
-        @keyframes rise {
-            0% { transform: translateY(0) scaleX(0.5); opacity: 0; }
-            5% { opacity: 0.8; }
-            75% { transform: translateY(-75vh) scaleX(1); opacity: 0.8; }
-            80% { opacity: 1; }
-            100% { transform: translateY(-75vh) scaleX(1); opacity: 0; }
+        
+        .redpacket {
+            position: absolute;
+            width: 60px;
+            height: 80px;
+            background: linear-gradient(135deg, #E6002D, #FF3366);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFD700;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 5px 15px rgba(230, 0, 45, 0.3);
+            border: 2px solid #FFD700;
+            font-size: 24px;
         }
-
-        @keyframes explode {
-            0% { transform: scale(0); opacity: 0; filter: blur(30px); }
-            5% { opacity: 1; filter: blur(0px); transform: scale(1.3); }
-            15% { transform: scale(1); }
-            100% { transform: scale(4); opacity: 0; filter: blur(50px); }
+        
+        .redpacket.big {
+            width: 80px;
+            height: 100px;
+            background: linear-gradient(135deg, #FFD700, #FFB347);
+            font-size: 28px;
         }
-
-        .firework-text { animation: explode 2.5s 6s ease-out forwards; }
-        .firework-trail { animation: rise 8s ease-out forwards; }
-
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.3); border-radius: 10px; }
-
-        .glass {
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        .redpacket.bomb {
+            background: linear-gradient(135deg, #333, #666);
+            color: #FF4444;
+            font-size: 32px;
         }
-
-        .sparkle-button {
-            background: linear-gradient(90deg, #FFD700, #FFA500);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        
+        .redpacket:hover {
+            transform: scale(1.1);
         }
-
-        .loading-dots:after {
-            content: '.';
-            animation: dots 1.5s steps(5, end) infinite;
+        
+        .basket {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 50px;
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            border-radius: 10px 10px 0 0;
+            transition: left 0.1s linear;
         }
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
+        
+        /* 游戏结束弹窗 */
+        .game-over-modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 26, 46, 0.95);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 100;
+            border: 3px solid var(--main-accent);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            min-width: 300px;
         }
-
-        /* 验证步骤指示器 */
-        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.3s; }
-        .step-dot.active { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
+        
+        .game-over-title {
+            font-size: 28px;
+            color: var(--main-accent);
+            margin-bottom: 20px;
+        }
+        
+        .game-over-stats {
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+        
+        .game-over-btn {
+            background: linear-gradient(135deg, var(--main-primary), #FF6B35);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .game-over-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 59, 31, 0.3);
+        }
+        
+        /* 游戏信息显示 */
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            font-size: 18px;
+        }
+        
+        .game-info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .game-info-label {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        
+        .game-info-value {
+            font-size: 20px;
+            color: #FFFF00;
+            font-weight: bold;
+        }
+        
+        /* 难度选择 */
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .difficulty-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid var(--main-accent);
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, var(--main-accent), #FFB347);
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .difficulty-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* 计时器 */
+        .game-timer {
+            font-size: 20px;
+            color: #FFFF00;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        /* ========== 新增的优化样式 ========== */
+        /* 俄罗斯方块控制按钮样式 */
+        .tetris-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tetris-control-btn {
+            background: linear-gradient(135deg, #FF3B1F, #FF6B35);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 60px;
+        }
+        
+        .tetris-control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 59, 31, 0.3);
+        }
+        
+        .tetris-control-btn i {
+            font-size: 20px;
+        }
+        
+        .tetris-rotate-btn {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+        }
+        
+        .tetris-drop-btn {
+            background: linear-gradient(135deg, #E6002D, #FF3366);
+        }
+        
+        /* 游戏成绩系统 */
+        .game-best-score {
+            text-align: center;
+            font-size: 18px;
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .score-break {
+            animation: scoreBreak 0.5s ease 3;
+            color: #FF4444;
+        }
+        
+        @keyframes scoreBreak {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        /* 水果消除游戏样式 */
+        .fruit-elimination-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 3px;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            .fruit-elimination-grid {
+                width: 320px;
+                height: 320px;
+            }
+        }
+        
+        .fruit-cell {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .fruit-cell {
+                font-size: 18px;
+            }
+        }
+        
+        .fruit-cell:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .fruit-cell.selected {
+            background: rgba(255, 200, 87, 0.3);
+            border: 2px solid #FFC857;
+        }
+        
+        .fruit-cell.eliminated {
+            animation: fadeOut 0.3s ease forwards;
+        }
+        
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+        
+        /* 游戏选择确认弹窗 */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .confirm-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            text-align: center;
+            border: 3px solid var(--main-accent);
+        }
+        
+        .confirm-title {
+            font-size: 24px;
+            color: var(--main-accent);
+            margin-bottom: 20px;
+        }
+        
+        .confirm-message {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .confirm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .confirm-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .confirm-yes {
+            background: linear-gradient(135deg, var(--main-primary), #FF6B35);
+            color: white;
+        }
+        
+        .confirm-no {
+            background: linear-gradient(135deg, #666, #888);
+            color: white;
+        }
+        
+        /* 游戏统计信息 */
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        /* 排行榜样式 */
+        .leaderboard-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .leaderboard-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            border: 3px solid var(--main-accent);
+        }
+        
+        .leaderboard-title {
+            font-size: 28px;
+            color: var(--main-accent);
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--main-accent);
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .leaderboard-game {
+            font-size: 18px;
+            color: var(--text-light);
+            font-weight: bold;
+        }
+        
+        .leaderboard-score {
+            font-size: 24px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        .no-record {
+            text-align: center;
+            color: #aaa;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        /* 滚动条美化 */
+        .blessing-wall::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .blessing-wall::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .blessing-wall::-webkit-scrollbar-thumb {
+            background: var(--main-accent);
+            border-radius: 4px;
+        }
+        
+        /* 游戏区域滚动条 */
+        .game-modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .game-modal-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .game-modal-content::-webkit-scrollbar-thumb {
+            background: var(--main-primary);
+            border-radius: 4px;
+        }
+        
+        /* 管理员特殊按钮 */
+        .admin-special-btn {
+            background: linear-gradient(135deg, #9B59B6, #8E44AD);
+            color: white;
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-special-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);
+        }
+        
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #9B59B6;
+            display: none;
+        }
+        
+        .admin-panel-title {
+            color: #9B59B6;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-status-badge {
+            background: linear-gradient(135deg, #9B59B6, #8E44AD);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
-
-    <!-- 背景系统 -->
-    <div id="sky" class="fixed inset-0 z-0 transition-all duration-[3000ms] bg-gradient-to-b from-slate-950 via-indigo-950 to-black">
-        <div id="celestial" class="absolute top-20 left-20 text-8xl transition-all duration-1000 transform translate-y-20 opacity-0">☀️</div>
-        <div id="weather-layer" class="absolute inset-0 pointer-events-none"></div>
-    </div>
-
-    <!-- 烟花渲染层 -->
-    <div id="firework-container" class="fixed inset-0 z-10 pointer-events-none flex items-center justify-center"></div>
-
-    <!-- ================= 外页: 欢迎与倒计时 ================= -->
-    <div id="landing-page" class="relative z-20 h-screen flex flex-col items-center justify-between py-12 px-6">
-        <div class="text-center">
-            <h1 class="text-6xl md:text-8xl font-black italic tracking-tighter drop-shadow-2xl animate-pulse">2026 MELAKA</h1>
-            <p class="text-xl md:text-2xl text-yellow-400 font-bold mt-2 uppercase tracking-[0.5em]">Countdown Festival</p>
+    <!-- 动态壁纸Canvas -->
+    <canvas id="background-canvas"></canvas>
+    
+    <!-- 烟花Canvas -->
+    <canvas id="fireworks-canvas"></canvas>
+    
+    <!-- 外页 -->
+    <div id="welcome-page">
+        <div class="header-zone">
+            <h1 class="main-title">🎉 2026跨年互动庆典 🎉</h1>
+            <p class="subtitle">迎接2026年新年 - 马六甲时间</p>
         </div>
-
-        <div class="w-full max-w-3xl glass rounded-[50px] p-12 text-center shadow-2xl border-2 border-yellow-500/30">
-            <h3 class="text-yellow-500 font-mono text-xs tracking-widest mb-4">DISTANCE TO NEW YEAR</h3>
-            <div id="countdown-timer" class="text-5xl md:text-8xl font-black font-mono bg-gradient-to-r from-yellow-200 via-orange-400 to-red-600 bg-clip-text text-transparent leading-none">
-                00d 00:00:00
+        
+        <div class="central-zone">
+            <div class="welcome-message">
+                <p>✨ 写下您的新年祝福，与朋友共同迎接2026年的到来。</p>
+                <p>⏰ <strong>跨年前1小时（12月31日23:00后）</strong>即可填写祝福并进入主庆典页面！</p>
+                <p>🎆 观看壮观的烟花表演，留下难忘的跨年回忆！</p>
+                <p id="admin-welcome-message" style="display: none; color: #9B59B6; font-weight: bold; margin-top: 10px;">
+                    🔓 管理员权限已激活：您可以无视时间限制，享受所有功能！
+                </p>
             </div>
             
-            <div class="mt-12 flex flex-col items-center gap-6">
-               <button onclick="toggleModal('wish-modal', true)" class="group relative px-16 py-6 bg-red-600 rounded-full text-2xl md:text-3xl font-black shadow-xl transition-all hover:scale-105 active:scale-95 border-b-8 border-red-900">
-                 <span class="relative z-10">🧧 提交祝福 · 进入现场</span>
-               </button>
-               <p id="entrance-hint" class="text-white/60 text-xs font-medium tracking-wide"></p>
+            <button id="blessing-btn" class="primary-btn float-animation blessing-btn-disabled">
+                <i class="fas fa-pen-fancy"></i> 填写祝福
+            </button>
+            
+            <button id="enter-main-btn" class="primary-btn" style="display: none; margin-top: 25px;">
+                <i class="fas fa-door-open"></i> 进入庆典主页面
+            </button>
+            
+            <!-- 管理员特殊按钮区域 -->
+            <div id="admin-quick-access" style="display: none; margin-top: 20px;">
+                <button id="admin-enter-now" class="primary-btn" style="background: linear-gradient(135deg, #9B59B6, #8E44AD);">
+                    <i class="fas fa-crown"></i> 管理员直接进入
+                </button>
+                <button id="admin-trigger-fireworks" class="primary-btn" style="background: linear-gradient(135deg, #FF9800, #FF5722); margin-top: 10px;">
+                    <i class="fas fa-fireworks"></i> 触发名字烟花
+                </button>
             </div>
-        </div>
-
-        <div class="flex gap-4">
-            <button onclick="toggleModal('admin-modal', true)" class="w-12 h-12 glass rounded-full flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity">🔑</button>
-            <button onclick="toggleModal('ai-config-modal', true)" class="w-12 h-12 glass rounded-full flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity">🤖</button>
-        </div>
-    </div>
-
-    <!-- ================= 内页: 主互动面板 ================= -->
-    <div id="main-page" class="relative z-20 h-screen flex p-8 gap-8 hidden">
-        <div class="w-[35%] flex flex-col glass rounded-[40px] overflow-hidden shadow-2xl">
-            <div class="p-8 bg-red-600 flex justify-between items-end">
+            
+            <div id="time-restriction-notice" class="time-restriction-notice">
+                <i class="fas fa-clock"></i> 
                 <div>
-                    <h2 class="text-3xl font-black italic tracking-tighter">WISH WALL</h2>
-                    <p class="text-[10px] opacity-70 uppercase font-bold tracking-widest">Live Broadcast</p>
-                </div>
-                <div id="wish-count" class="text-2xl font-black text-yellow-300">0</div>
-            </div>
-            <div id="wish-list" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"></div>
-        </div>
-
-        <div class="w-[30%] flex flex-col items-center justify-between py-12 pointer-events-none">
-            <div id="clock" class="glass px-10 py-4 rounded-full border border-yellow-500/30 text-4xl font-black font-mono text-yellow-400 shadow-2xl">00:00:00</div>
-            <div class="opacity-20 flex flex-col items-center">
-                <div class="w-px h-32 bg-gradient-to-t from-transparent via-white to-transparent"></div>
-            </div>
-        </div>
-
-        <div class="w-[35%] flex flex-col gap-8">
-            <div class="glass p-10 rounded-[40px] border border-yellow-500/20 shadow-2xl">
-                <h3 class="text-3xl font-black italic mb-8">ENTERTAINMENT</h3>
-                <div class="grid grid-cols-2 gap-4" id="game-grid"></div>
-                <div class="mt-6 p-4 bg-white/5 rounded-2xl border border-white/10">
-                    <button onclick="generateAIHoroscope()" id="btn-ai-horoscope" class="w-full py-3 sparkle-button text-black font-black rounded-xl text-sm flex items-center justify-center gap-2">
-                        ✨ 查看 2026 AI 运势
-                    </button>
-                    <div id="ai-fortune-result" class="mt-4 text-xs italic text-yellow-200/80 leading-relaxed hidden"></div>
-                </div>
-            </div>
-
-            <div class="mt-auto glass p-8 rounded-[30px] text-center">
-                <div class="flex justify-center gap-2 mb-4">
-                    <span id="sync-indicator" class="w-2 h-2 bg-yellow-500 rounded-full animate-ping"></span>
-                    <span class="w-2 h-2 bg-yellow-500 rounded-full animate-ping" style="animation-delay: 0.2s"></span>
-                </div>
-                <p id="sync-status-text" class="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Local Mode</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- AI 配置弹窗 -->
-    <div id="ai-config-modal" class="fixed inset-0 z-[120] glass flex items-center justify-center p-6 hidden">
-        <div class="bg-indigo-900 p-8 rounded-[40px] w-full max-w-md border-2 border-indigo-400 shadow-2xl">
-            <h2 class="text-2xl font-black text-indigo-300 mb-4 italic">Gemini API 配置</h2>
-            <input id="ai-api-key-input" type="password" placeholder="Paste your API Key here" class="w-full bg-black/40 border-2 border-indigo-700 rounded-xl px-4 py-3 text-sm focus:border-indigo-400 outline-none mb-6">
-            <div class="flex gap-4">
-                <button onclick="toggleModal('ai-config-modal', false)" class="flex-1 font-bold">关闭</button>
-                <button onclick="saveAIKey()" class="flex-1 py-3 bg-indigo-500 rounded-xl font-black">保存配置</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 提交祝福弹窗 -->
-    <div id="wish-modal" class="fixed inset-0 z-[100] glass flex items-center justify-center p-6 hidden">
-        <div class="bg-red-600 w-full max-w-lg rounded-[50px] p-10 shadow-2xl border-4 border-yellow-400">
-            <h2 class="text-4xl font-black text-center mb-8 italic text-yellow-300">SUBMIT WISH</h2>
-            <div class="space-y-4 text-left">
-                <input id="form-name" type="text" placeholder="您的名字 / Nickname" class="w-full bg-white/10 rounded-2xl px-6 py-4 outline-none border-2 border-white/20 focus:border-yellow-400 font-bold">
-                <div class="relative">
-                    <textarea id="form-wish" placeholder="2026 祈愿..." class="w-full bg-white/10 rounded-2xl px-6 py-4 h-32 resize-none outline-none border-2 border-white/20 focus:border-yellow-400 font-bold"></textarea>
-                    <button id="btn-ai-polish" onclick="polishWish()" class="absolute right-4 bottom-4 px-3 py-1 bg-yellow-400 text-red-900 text-[10px] font-black rounded-lg shadow-lg hover:scale-105 transition-transform">
-                        ✨ AI 润色
-                    </button>
-                </div>
-                <div class="flex gap-4 pt-4">
-                    <button onclick="toggleModal('wish-modal', false)" class="flex-1 py-4 bg-black/20 rounded-xl font-bold">返回</button>
-                    <button id="btn-submit" class="flex-[2] py-4 bg-yellow-400 text-red-900 rounded-xl font-black text-xl shadow-lg">确认提交 🧧</button>
+                    <strong>时间限制：</strong>普通用户只能在跨年前1小时（12月31日23:00后）填写祝福并进入主庆典页面<br>
+                    <small>当前时间：<span id="current-time-display">--:--:--</span> | 日期：<span id="current-date-display">--</span> | 开放时间：12月31日23:00后</small>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- 管理员三重验证弹窗 -->
-    <div id="admin-modal" class="fixed inset-0 z-[110] glass flex items-center justify-center p-6 hidden">
-        <div class="bg-slate-900 p-10 rounded-[40px] w-full max-w-md border-2 border-blue-500 shadow-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black text-blue-400 italic tracking-widest">IDENTITY CHECK</h2>
-                <!-- 进度指示器 -->
-                <div class="flex gap-2">
-                    <div id="step-1-dot" class="step-dot active"></div>
-                    <div id="step-2-dot" class="step-dot"></div>
-                    <div id="step-3-dot" class="step-dot"></div>
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <p id="admin-label" class="text-xs font-bold text-white/50 uppercase tracking-widest">Step 1: 请输入暗语 (Keyword)</p>
-                <input id="adm-key" type="password" placeholder="..." class="w-full bg-black/50 border-2 border-blue-900 rounded-xl px-5 py-3 text-sm focus:border-blue-400 outline-none">
-                
-                <div class="flex flex-wrap gap-4 pt-6" id="admin-actions">
-                    <button id="btn-admin-close" onclick="resetAdminFlow(); toggleModal('admin-modal', false);" class="flex-1 text-slate-500 font-bold">取消</button>
-                    <button id="btn-admin-next" onclick="processAdminStep()" class="flex-[2] py-3 bg-blue-600 rounded-xl font-black shadow-lg">下一步</button>
-                    
-                    <!-- 验证成功后显示的快捷进入按钮 -->
-                    <button id="btn-quick-enter" onclick="toggleView(); toggleModal('admin-modal', false);" class="w-full py-4 bg-green-600 rounded-xl font-black shadow-lg hidden animate-bounce">🚀 验证完毕 · 直接进入现场</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        let firebaseConfig = null;
-        let useFirebase = false;
         
-        try {
-            if (typeof __firebase_config !== 'undefined') {
-                firebaseConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
-                useFirebase = true;
-            }
-        } catch (e) {}
-
-        window.GEMINI_API_KEY = localStorage.getItem('gemini_api_key') || "";
-
-        window.saveAIKey = () => {
-            const val = document.getElementById('ai-api-key-input').value;
-            if(val) {
-                window.GEMINI_API_KEY = val;
-                localStorage.setItem('gemini_api_key', val);
-                toggleModal('ai-config-modal', false);
-            }
-        };
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'melaka-2026';
-        const PUBLIC_PATH = ['artifacts', appId, 'public', 'data'];
-        let isAdmin = false;
-
-        // 管理员三步验证逻辑
-        let adminStep = 1;
-        const ADMIN_FLOW = {
-            1: { label: "Step 1: 请输入暗语 (Keyword)", key: "ShyuanQinn" },
-            2: { label: "Step 2: 请输入暗号 (Secret Code)", key: "KADETJPJ2025" },
-            3: { label: "Step 3: 请输入密码 (Password)", key: "MoeStar!2025" }
-        };
-
-        window.resetAdminFlow = () => {
-            adminStep = 1;
-            isAdmin = false;
-            document.getElementById('admin-label').innerText = ADMIN_FLOW[1].label;
-            document.getElementById('adm-key').value = '';
-            document.getElementById('adm-key').classList.remove('hidden');
-            document.getElementById('btn-admin-next').classList.remove('hidden');
-            document.getElementById('btn-quick-enter').classList.add('hidden');
-            for(let i=1; i<=3; i++) document.getElementById(`step-${i}-dot`).className = `step-dot ${i===1?'active':''}`;
-        };
-
-        window.processAdminStep = () => {
-            const inputVal = document.getElementById('adm-key').value;
-            const targetKey = ADMIN_FLOW[adminStep].key;
-
-            if (inputVal === targetKey) {
-                if (adminStep < 3) {
-                    adminStep++;
-                    document.getElementById('admin-label').innerText = ADMIN_FLOW[adminStep].label;
-                    document.getElementById('adm-key').value = '';
-                    document.getElementById(`step-${adminStep}-dot`).classList.add('active');
-                } else {
-                    // 全部通过
-                    isAdmin = true;
-                    document.getElementById('admin-label').innerText = "Identity Verified (身份已确认)";
-                    document.getElementById('adm-key').classList.add('hidden');
-                    document.getElementById('btn-admin-next').classList.add('hidden');
-                    document.getElementById('btn-quick-enter').classList.remove('hidden');
-                }
-            } else {
-                alert("验证失败，请重新输入当前步骤内容。");
-                document.getElementById('adm-key').value = '';
-            }
-        };
-
-        async function callGemini(prompt, systemPrompt = "") {
-            if (!window.GEMINI_API_KEY) return null;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${window.GEMINI_API_KEY}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
-            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            const result = await response.json();
-            return result.candidates?.[0]?.content?.parts?.[0]?.text;
-        }
-
-        window.polishWish = async () => {
-            const textArea = document.getElementById('form-wish');
-            const originalText = textArea.value.trim();
-            if (!originalText) return;
-            const res = await callGemini(`请润色：${originalText}`, "祝福语大师。");
-            if (res) textArea.value = res.replace(/["“”]/g, '').trim();
-        };
-
-        window.generateAIHoroscope = async () => {
-            const resultDiv = document.getElementById('ai-fortune-result');
-            const res = await callGemini(`生成2026跨年运势短评。`, "未来占星师。");
-            if (res) { resultDiv.innerText = res; resultDiv.classList.remove('hidden'); }
-        };
-
-        const handleWishesUpdate = (wishes) => {
-            wishes.sort((a,b) => b.timestamp - a.timestamp);
-            document.getElementById('wish-count').innerText = wishes.length;
-            document.getElementById('wish-list').innerHTML = wishes.map(w => `
-                <div class="bg-white/5 p-6 rounded-3xl border border-white/5 hover:border-yellow-500/30">
-                    <div class="flex justify-between text-xs font-bold mb-3">
-                        <span class="text-yellow-400">@${w.nickname}</span>
-                        <span class="opacity-30">${w.timeLabel}</span>
+        <div class="countdown-container">
+            <div class="melaka-time" id="melaka-time-display">--:--:--</div>
+            <div class="countdown" id="countdown-display">加载中...</div>
+            <div id="admin-countdown-badge" style="display: none; font-size: 12px; color: #9B59B6; margin-top: 5px;">
+                🔓 管理员模式
+            </div>
+        </div>
+        
+        <div class="footer-zone">
+            <button id="admin-btn" class="admin-btn" title="管理员入口">
+                <i class="fas fa-key"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 内页 -->
+    <div id="main-page">
+        <div id="main-content">
+            <div class="main-container">
+                <header class="main-header">
+                    <div>
+                        <div class="melaka-time" id="main-melaka-time">马六甲时间 --:--:--</div>
+                        <div style="margin-top: 5px; font-size: 14px; color: #FFD700;">
+                            2026年新年倒计时
+                            <span id="admin-status-indicator" style="display: none; color: #9B59B6; margin-left: 10px;">
+                                🔓 管理员模式
+                            </span>
+                        </div>
                     </div>
-                    <p class="text-lg font-bold">${w.wish}</p>
+                    <div class="main-countdown" id="main-countdown">--天 --:--:--</div>
+                    <div style="text-align: right;">
+                        <div class="online-badge">
+                            在线: <strong id="online-count">1</strong>人
+                        </div>
+                        <div style="margin-top: 10px; font-size: 14px; color: #4ECDC4;">
+                            状态: <span id="celebration-status">进行中</span>
+                        </div>
+                    </div>
+                </header>
+                
+                <!-- 管理员控制面板 -->
+                <div id="admin-control-panel" class="admin-panel" style="display: none;">
+                    <div class="admin-panel-title">
+                        <i class="fas fa-user-shield"></i> 管理员控制面板
+                        <span class="admin-status-badge">已激活</span>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <button class="admin-special-btn" id="admin-trigger-name-fireworks">
+                            <i class="fas fa-fireworks"></i> 触发名字烟花
+                        </button>
+                        <button class="admin-special-btn" id="admin-add-blessing">
+                            <i class="fas fa-comment-medical"></i> 添加祝福语
+                        </button>
+                        <button class="admin-special-btn" id="admin-reset-games">
+                            <i class="fas fa-redo"></i> 重置游戏记录
+                        </button>
+                        <button class="admin-special-btn" id="admin-simulate-newyear">
+                            <i class="fas fa-clock"></i> 模拟新年时刻
+                        </button>
+                    </div>
                 </div>
-            `).join('');
-        };
+                
+                <div class="content-area">
+                    <div class="left-zone">
+                        <h2 class="zone-title"><i class="fas fa-comments"></i> 祝福墙</h2>
+                        <div class="blessing-wall" id="blessing-wall">
+                            <!-- 祝福消息将通过JavaScript动态添加 -->
+                        </div>
+                    </div>
+                    
+                    <div class="center-zone">
+                        <div style="text-align: center; color: var(--text-light);">
+                            <i class="fas fa-fireworks" style="font-size: 48px; color: #FFC857; margin-bottom: 15px; display: block;"></i>
+                            <h3>🎆 烟花表演区</h3>
+                            <p>新年钟声敲响时<br>这里将上演壮观的烟花表演！</p>
+                            <div id="admin-fireworks-control" style="display: none; margin-top: 20px;">
+                                <button class="admin-special-btn" id="trigger-fireworks-now">
+                                    <i class="fas fa-bolt"></i> 立即燃放烟花
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="right-zone">
+                        <h2 class="zone-title"><i class="fas fa-gamepad"></i> 新年小游戏</h2>
+                        <div class="game-grid">
+                            <!-- 游戏按钮将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <footer class="main-footer">
+                    <div style="font-size: 18px;">
+                        当前有 <span class="online-badge"><strong id="live-online-count">1</strong></span> 人正在参与庆典
+                    </div>
+                    <div>
+                        <button id="main-admin-btn" class="admin-btn" style="display: none; margin-right: 10px;">
+                            <i class="fas fa-user-shield"></i>
+                        </button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 弹窗 -->
+    <div id="blessing-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header"><i class="fas fa-pen-nib"></i> 填写新年祝福</h2>
+            <div id="admin-blessing-notice" style="display: none; background: rgba(155, 89, 182, 0.2); color: #9B59B6; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold;">
+                🔓 管理员模式：无视时间限制
+            </div>
+            <form id="blessing-form">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> 您的昵称</label>
+                    <input type="text" id="nickname" class="form-control" placeholder="请输入您的昵称（最多20字）" maxlength="20" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-heart"></i> 这一年的感谢/帮助</label>
+                    <textarea id="thanks" class="form-control" placeholder="写下这一年您想感谢的人或事，获得的帮助等..." maxlength="200" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-star"></i> 2026新年祝福</label>
+                    <textarea id="blessing" class="form-control" placeholder="写下您对2026年的祝福和期望..." maxlength="200" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-clock"></i> 提交时间（马六甲时间）</label>
+                    <input type="text" id="submit-time" class="form-control" readonly style="background: rgba(255, 255, 255, 0.05);">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="submit" class="modal-btn submit-btn">
+                        <i class="fas fa-paper-plane"></i> 提交祝福
+                    </button>
+                    <button type="button" id="close-blessing-modal" class="modal-btn close-btn">
+                        <i class="fas fa-times"></i> 取消
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="admin-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header"><i class="fas fa-user-shield"></i> 管理员验证</h2>
+            <form id="admin-form">
+                <div class="form-group">
+                    <label><i class="fas fa-user-secret"></i> 暗语</label>
+                    <input type="password" id="admin-phrase" class="form-control" placeholder="请输入暗语" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> 暗号</label>
+                    <input type="password" id="admin-code" class="form-control" placeholder="请输入暗号" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> 密码</label>
+                    <input type="password" id="admin-password" class="form-control" placeholder="请输入密码" required>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="submit" class="modal-btn submit-btn">
+                        <i class="fas fa-check-circle"></i> 验证
+                    </button>
+                    <button type="button" id="close-admin-modal" class="modal-btn close-btn">
+                        <i class="fas fa-times"></i> 取消
+                    </button>
+                </div>
+            </form>
+            <div id="admin-message" style="margin-top: 20px; padding: 15px; border-radius: 10px; text-align: center; font-weight: 700;"></div>
+        </div>
+    </div>
+    
+    <div id="game-modal" class="game-modal">
+        <div class="game-modal-content">
+            <button class="close-game-btn" id="close-game-modal">×</button>
+            <h2 class="game-title" id="game-title">游戏即将开放</h2>
+            <div class="game-info" id="game-info" style="display: none;">
+                <div class="game-info-item">
+                    <div class="game-info-label">得分</div>
+                    <div class="game-info-value" id="game-score-value">0</div>
+                </div>
+                <div class="game-info-item">
+                    <div class="game-info-label">等级</div>
+                    <div class="game-info-value" id="game-level-value">1</div>
+                </div>
+                <div class="game-info-item">
+                    <div class="game-info-label">时间</div>
+                    <div class="game-info-value" id="game-time-value">60</div>
+                </div>
+            </div>
+            <div class="game-area" id="game-area">
+                <!-- 游戏内容将动态加载 -->
+            </div>
+            <div id="game-instructions">游戏说明将在这里显示</div>
+            <div id="game-controls">
+                <button id="game-start" class="game-control-btn">开始游戏</button>
+                <button id="game-restart" class="game-control-btn">重新开始</button>
+            </div>
+            <div id="game-score"></div>
+        </div>
+    </div>
+    
+    <!-- 确认弹窗 -->
+    <div id="confirm-modal" class="confirm-modal">
+        <div class="confirm-content">
+            <h3 class="confirm-title">重新开始游戏</h3>
+            <div class="confirm-message" id="confirm-message">
+                当前游戏正在进行中，您的当前得分为：0<br>
+                重新开始将丢失当前进度，确定要重新开始吗？
+            </div>
+            <div class="confirm-actions">
+                <button class="confirm-btn confirm-yes" id="confirm-restart-yes">重新开始</button>
+                <button class="confirm-btn confirm-no" id="confirm-restart-no">取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 排行榜弹窗 -->
+    <div id="leaderboard-modal" class="leaderboard-modal">
+        <div class="leaderboard-content">
+            <button class="close-game-btn" id="close-leaderboard">×</button>
+            <h2 class="leaderboard-title"><i class="fas fa-trophy"></i> 游戏排行榜</h2>
+            <div id="leaderboard-content">
+                <!-- 排行榜内容将动态加载 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 消息提示 -->
+    <div id="message-popup" class="message-popup"></div>
 
-        const initialize = async () => {
-            if (useFirebase && firebaseConfig) {
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                const db = getFirestore(app);
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else { await signInAnonymously(auth); }
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        onSnapshot(collection(db, ...PUBLIC_PATH, 'wishes'), (snap) => {
-                            handleWishesUpdate(snap.docs.map(d => d.data()));
+    <script>
+        // ==================== 全局配置 ====================
+        const CONFIG = {
+            MALACCA_TIMEZONE: 8, // UTC+8
+            NEW_YEAR_2026: new Date('2026-01-01T00:00:00+08:00'),
+            ENTRY_OPEN_HOUR: 23, // 12月31日23:00后可以进入
+            ADMIN_CREDENTIALS: {
+                phrase: "ShyuanQinn",
+                code: "KADETJPJ2025",
+                password: "MoeStar!2025"
+            },
+            NAME_FIREWORKS_LIST: [
+                "祝",
+                "AQEEL HARIS TAM",
+                "BRYAN LIM",
+                "CHRONUS SIM",
+                "DECLAN YOONG",
+                "DERRICK HOE",
+                "LIM YU HONG",
+                "LIM WEI FENG",
+                "LYE JUN FENG",
+                "TEO JUAN KIT",
+                "YONG KAI MING",
+                "还有我",
+                "跨年快乐，新年快乐"
+            ],
+            BLESSING_MESSAGES: [
+                {
+                    nickname: "新年快乐",
+                    thanks: "感谢家人一年的支持与陪伴，感谢朋友的鼓励",
+                    blessing: "愿2026年大家健康平安，梦想成真，幸福常伴！",
+                    time: "2025-12-31 17:30:00"
+                },
+                {
+                    nickname: "梦想启航",
+                    thanks: "感谢老师的指导，感谢团队的合作",
+                    blessing: "2026年，愿我们都能展翅高飞，实现心中梦想！",
+                    time: "2025-12-31 16:45:00"
+                },
+                {
+                    nickname: "时光飞逝",
+                    thanks: "感谢2025年所有帮助过我的人",
+                    blessing: "2026年，愿时光温柔，岁月静好，大家都能收获满满！",
+                    time: "2025-12-31 15:20:00"
+                },
+                {
+                    nickname: "快乐的小星星",
+                    thanks: "感谢父母的养育之恩，感谢老师的辛勤教导",
+                    blessing: "希望2026年世界和平，人人都能健康快乐！",
+                    time: "2025-12-31 14:50:00"
+                },
+                {
+                    nickname: "追梦者",
+                    thanks: "感谢自己今年的努力和坚持",
+                    blessing: "2026年，希望事业更上一层楼，家人健康平安！",
+                    time: "2025-12-31 13:25:00"
+                },
+                {
+                    nickname: "阳光少年",
+                    thanks: "感谢朋友的陪伴，感谢生活的美好",
+                    blessing: "愿2026年每个人都充满希望，活出自己的精彩！",
+                    time: "2025-12-31 12:10:00"
+                },
+                {
+                    nickname: "幸运草",
+                    thanks: "感谢所有遇见的美好事物",
+                    blessing: "2026年，希望好运连连，事事顺心如意！",
+                    time: "2025-12-31 11:05:00"
+                },
+                {
+                    nickname: "彩虹",
+                    thanks: "感谢风雨后的阳光，感谢困难中的成长",
+                    blessing: "愿2026年每个人都能看到生活中的彩虹！",
+                    time: "2025-12-31 10:00:00"
+                },
+                {
+                    nickname: "小小鸟",
+                    thanks: "感谢自由的天空，感谢温暖的巢穴",
+                    blessing: "2026年，愿我们都能自由飞翔，安全归巢！",
+                    time: "2025-12-31 09:15:00"
+                },
+                {
+                    nickname: "奋斗者",
+                    thanks: "感谢挫折让我成长，感谢机会让我进步",
+                    blessing: "2026年，继续奋斗，创造更美好的明天！",
+                    time: "2025-12-31 08:30:00"
+                },
+                {
+                    nickname: "温馨的家",
+                    thanks: "感谢家人的爱与关怀，感谢家庭的温暖",
+                    blessing: "愿2026年每个家庭都和和美美，幸福安康！",
+                    time: "2025-12-31 07:45:00"
+                },
+                {
+                    nickname: "希望之光",
+                    thanks: "感谢黑暗中的光明，感谢迷茫中的指引",
+                    blessing: "2026年，愿希望之光照亮每个人的前行之路！",
+                    time: "2025-12-31 06:50:00"
+                },
+                {
+                    nickname: "快乐的雨滴",
+                    thanks: "感谢雨露滋润万物，感谢阳光温暖大地",
+                    blessing: "2026年，愿生活如春雨般滋润，如阳光般温暖！",
+                    time: "2025-12-31 05:20:00"
+                },
+                {
+                    nickname: "勇敢的心",
+                    thanks: "感谢勇气的源泉，感谢坚持的力量",
+                    blessing: "2026年，愿我们都有勇气面对挑战，坚持到底！",
+                    time: "2025-12-31 04:10:00"
+                },
+                {
+                    nickname: "和平使者",
+                    thanks: "感谢和平的珍贵，感谢理解的力量",
+                    blessing: "愿2026年世界更加和平，人们更加理解彼此！",
+                    time: "2025-12-31 03:00:00"
+                }
+            ]
+        };
+        
+        // ==================== 动态壁纸系统 ====================
+        class DynamicWallpaper {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                if (!this.canvas) {
+                    console.error('背景Canvas元素不存在');
+                    return;
+                }
+                
+                this.ctx = this.canvas.getContext('2d');
+                this.stars = [];
+                this.meteors = [];
+                this.meteorTimer = 0;
+                this.init();
+            }
+            
+            init() {
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                this.createStars();
+                this.animate();
+            }
+            
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.createStars(); // 重新创建星星以适应新尺寸
+            }
+            
+            createStars() {
+                this.stars = [];
+                const starCount = Math.floor((this.canvas.width * this.canvas.height) / 5000);
+                
+                for (let i = 0; i < starCount; i++) {
+                    this.stars.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 2 + 0.5,
+                        brightness: Math.random() * 0.8 + 0.2,
+                        twinkleSpeed: Math.random() * 0.05 + 0.02,
+                        twinkleOffset: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+            
+            createMeteor() {
+                const side = Math.floor(Math.random() * 4); // 0:上, 1:右, 2:下, 3:左
+                let x, y, vx, vy;
+                
+                switch(side) {
+                    case 0: // 从上边
+                        x = Math.random() * this.canvas.width;
+                        y = -10;
+                        vx = (Math.random() - 0.5) * 2;
+                        vy = Math.random() * 3 + 2;
+                        break;
+                    case 1: // 从右边
+                        x = this.canvas.width + 10;
+                        y = Math.random() * this.canvas.height;
+                        vx = -(Math.random() * 3 + 2);
+                        vy = (Math.random() - 0.5) * 2;
+                        break;
+                    case 2: // 从下边
+                        x = Math.random() * this.canvas.width;
+                        y = this.canvas.height + 10;
+                        vx = (Math.random() - 0.5) * 2;
+                        vy = -(Math.random() * 3 + 2);
+                        break;
+                    case 3: // 从左边
+                        x = -10;
+                        y = Math.random() * this.canvas.height;
+                        vx = Math.random() * 3 + 2;
+                        vy = (Math.random() - 0.5) * 2;
+                        break;
+                }
+                
+                this.meteors.push({
+                    x, y,
+                    vx, vy,
+                    life: 100,
+                    length: Math.random() * 30 + 20,
+                    width: Math.random() * 3 + 1,
+                    color: `rgba(${Math.floor(Math.random() * 100 + 155)}, ${Math.floor(Math.random() * 100 + 155)}, 255, 1)`
+                });
+            }
+            
+            drawStars() {
+                const now = Date.now() / 1000;
+                
+                this.stars.forEach(star => {
+                    const brightness = star.brightness * (0.7 + 0.3 * Math.sin(now * star.twinkleSpeed + star.twinkleOffset));
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+                    this.ctx.fill();
+                });
+            }
+            
+            drawMeteors() {
+                for (let i = this.meteors.length - 1; i >= 0; i--) {
+                    const meteor = this.meteors[i];
+                    
+                    // 更新位置
+                    meteor.x += meteor.vx;
+                    meteor.y += meteor.vy;
+                    meteor.life -= 2;
+                    
+                    // 绘制流星
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(meteor.x, meteor.y);
+                    this.ctx.lineTo(
+                        meteor.x - meteor.vx * meteor.length / 10,
+                        meteor.y - meteor.vy * meteor.length / 10
+                    );
+                    this.ctx.strokeStyle = meteor.color.replace('1)', `${meteor.life / 100})`);
+                    this.ctx.lineWidth = meteor.width;
+                    this.ctx.stroke();
+                    
+                    // 绘制流星尾迹
+                    const gradient = this.ctx.createLinearGradient(
+                        meteor.x, meteor.y,
+                        meteor.x - meteor.vx * meteor.length / 5, meteor.y - meteor.vy * meteor.length / 5
+                    );
+                    gradient.addColorStop(0, meteor.color.replace('1)', `${meteor.life / 200})`));
+                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(meteor.x, meteor.y);
+                    this.ctx.lineTo(
+                        meteor.x - meteor.vx * meteor.length / 2,
+                        meteor.y - meteor.vy * meteor.length / 2
+                    );
+                    this.ctx.strokeStyle = gradient;
+                    this.ctx.lineWidth = meteor.width * 2;
+                    this.ctx.stroke();
+                    
+                    // 移除消失的流星
+                    if (meteor.life <= 0 || 
+                        meteor.x < -50 || meteor.x > this.canvas.width + 50 ||
+                        meteor.y < -50 || meteor.y > this.canvas.height + 50) {
+                        this.meteors.splice(i, 1);
+                    }
+                }
+            }
+            
+            animate() {
+                // 清除画布（使用深蓝到浅蓝的渐变背景）
+                const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+                gradient.addColorStop(0, '#0a0a2a');
+                gradient.addColorStop(0.5, '#1a1a4a');
+                gradient.addColorStop(1, '#2a2a6a');
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 绘制星星
+                this.drawStars();
+                
+                // 随机生成流星
+                this.meteorTimer++;
+                if (this.meteorTimer > 60 && Math.random() < 0.02) {
+                    this.createMeteor();
+                    this.meteorTimer = 0;
+                }
+                
+                // 绘制流星
+                this.drawMeteors();
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // ==================== 烟花系统 ====================
+        class FireworksSystem {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                if (!this.canvas) {
+                    console.error('烟花Canvas元素不存在');
+                    return;
+                }
+                
+                this.ctx = this.canvas.getContext('2d');
+                this.activeFireworks = [];
+                this.nameSequenceActive = false;
+                this.currentNameIndex = 0;
+                this.nameTimeout = null;
+                this.nameColors = this.generateNameColors();
+                this.init();
+            }
+            
+            init() {
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                this.animate();
+                
+                // 检查新年烟花
+                this.checkNewYearFireworks();
+            }
+            
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            generateNameColors() {
+                // 生成多种鲜艳颜色（排除红色#FF0000、黑色#000000、白色#FFFFFF）
+                return [
+                    '#FFD700', // 金色
+                    '#00FF00', // 亮绿色
+                    '#00FFFF', // 青色
+                    '#FF00FF', // 品红色
+                    '#FFFF00', // 黄色
+                    '#00FF80', // 春绿色
+                    '#FF8000', // 橙色
+                    '#0080FF', // 亮蓝色
+                    '#80FF00', // 黄绿色
+                    '#FF0080', // 玫瑰红
+                    '#80FFFF', // 淡青色
+                    '#FF80FF'  // 浅品红色
+                ];
+            }
+            
+            triggerNameFireworks() {
+                if (this.nameSequenceActive) return;
+                
+                this.nameSequenceActive = true;
+                this.currentNameIndex = 0;
+                
+                // 隐藏内页内容
+                if (document.getElementById('main-content')) {
+                    document.getElementById('main-content').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('main-content').style.display = 'none';
+                    }, 500);
+                }
+                
+                // 3秒后开始显示名字烟花
+                setTimeout(() => {
+                    this.showNextName();
+                }, 3000);
+            }
+            
+            showNextName() {
+                if (this.currentNameIndex >= CONFIG.NAME_FIREWORKS_LIST.length) {
+                    // 所有名字显示完毕，5秒后恢复内容
+                    this.nameSequenceActive = false;
+                    
+                    setTimeout(() => {
+                        if (document.getElementById('main-content')) {
+                            document.getElementById('main-content').style.display = 'block';
+                            setTimeout(() => {
+                                document.getElementById('main-content').style.opacity = '1';
+                            }, 50);
+                        }
+                    }, 5000);
+                    
+                    return;
+                }
+                
+                const name = CONFIG.NAME_FIREWORKS_LIST[this.currentNameIndex];
+                const color = this.nameColors[this.currentNameIndex % this.nameColors.length];
+                
+                // 创建名字烟花
+                this.createNameFirework(name, color);
+                this.currentNameIndex++;
+                
+                // 8秒后显示下一个名字
+                this.nameTimeout = setTimeout(() => {
+                    this.showNextName();
+                }, 8000);
+            }
+            
+            createNameFirework(name, color) {
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 3;
+                const fontSize = name === "祝" ? 72 : 48;
+                
+                // 创建文字粒子 - 增加字符间距
+                const particles = [];
+                const charSpacing = name === "祝" ? 1.5 : 1.8; // 增加间距系数
+                const textWidth = name.length * fontSize * charSpacing;
+                const startX = centerX - textWidth / 2;
+                
+                for (let i = 0; i < name.length; i++) {
+                    particles.push({
+                        type: 'text',
+                        char: name[i],
+                        x: startX + i * fontSize * charSpacing,
+                        y: centerY,
+                        targetY: centerY,
+                        color: color,
+                        size: fontSize,
+                        life: 100,
+                        velocityY: -5 - Math.random() * 3,
+                        opacity: 1
+                    });
+                }
+                
+                // 添加爆炸粒子
+                for (let i = 0; i < 100; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 2 + Math.random() * 4;
+                    
+                    particles.push({
+                        type: 'particle',
+                        x: centerX,
+                        y: centerY,
+                        color: color,
+                        size: Math.random() * 4 + 2,
+                        life: 100,
+                        velocityX: Math.cos(angle) * speed,
+                        velocityY: Math.sin(angle) * speed,
+                        gravity: 0.1,
+                        opacity: 0.8
+                    });
+                }
+                
+                this.activeFireworks.push({
+                    particles: particles,
+                    life: 200
+                });
+            }
+            
+            updateFireworks() {
+                for (let i = this.activeFireworks.length - 1; i >= 0; i--) {
+                    const firework = this.activeFireworks[i];
+                    
+                    for (let j = firework.particles.length - 1; j >= 0; j--) {
+                        const particle = firework.particles[j];
+                        
+                        if (particle.type === 'text') {
+                            // 文字粒子上升效果
+                            particle.y += particle.velocityY;
+                            particle.velocityY *= 0.95;
+                            
+                            if (particle.y <= particle.targetY) {
+                                particle.y = particle.targetY;
+                                particle.velocityY = 0;
+                            }
+                        } else {
+                            // 爆炸粒子
+                            particle.x += particle.velocityX;
+                            particle.y += particle.velocityY;
+                            particle.velocityY += particle.gravity;
+                        }
+                        
+                        particle.life -= 0.5;
+                        particle.opacity = particle.life / 100;
+                        
+                        if (particle.life <= 0) {
+                            firework.particles.splice(j, 1);
+                        }
+                    }
+                    
+                    firework.life -= 0.5;
+                    
+                    if (firework.life <= 0 || firework.particles.length === 0) {
+                        this.activeFireworks.splice(i, 1);
+                    }
+                }
+            }
+            
+            drawFireworks() {
+                this.activeFireworks.forEach(firework => {
+                    firework.particles.forEach(particle => {
+                        this.ctx.save();
+                        this.ctx.globalAlpha = particle.opacity;
+                        
+                        if (particle.type === 'text') {
+                            // 绘制文字
+                            this.ctx.font = `bold ${particle.size}px Montserrat`;
+                            this.ctx.fillStyle = particle.color;
+                            this.ctx.textAlign = 'center';
+                            this.ctx.textBaseline = 'middle';
+                            this.ctx.shadowColor = particle.color;
+                            this.ctx.shadowBlur = 20;
+                            this.ctx.fillText(particle.char, particle.x, particle.y);
+                        } else {
+                            // 绘制圆形粒子
+                            this.ctx.beginPath();
+                            this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                            this.ctx.fillStyle = particle.color;
+                            this.ctx.shadowColor = particle.color;
+                            this.ctx.shadowBlur = 10;
+                            this.ctx.fill();
+                        }
+                        
+                        this.ctx.restore();
+                    });
+                });
+            }
+            
+            animate() {
+                // 使用半透明黑色实现拖尾效果
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 更新和绘制烟花
+                this.updateFireworks();
+                this.drawFireworks();
+                
+                requestAnimationFrame(() => this.animate());
+            }
+            
+            checkNewYearFireworks() {
+                const now = getMalaccaTime();
+                if (now.getFullYear() === 2026 && now.getMonth() === 0 && 
+                    now.getDate() === 1 && now.getHours() === 0 && 
+                    now.getMinutes() === 0 && now.getSeconds() <= 30) {
+                    
+                    this.triggerNewYearFireworks();
+                }
+                
+                setTimeout(() => this.checkNewYearFireworks(), 1000);
+            }
+            
+            triggerNewYearFireworks() {
+                // 自动新年烟花
+                const messages = ["2026跨年快乐", "2026新年快乐", "Happy 2026"];
+                
+                for (let i = 0; i < 30; i++) {
+                    setTimeout(() => {
+                        const x = Math.random() * this.canvas.width;
+                        const y = this.canvas.height;
+                        const color = this.nameColors[Math.floor(Math.random() * this.nameColors.length)];
+                        const message = messages[i % messages.length];
+                        
+                        this.createNameFirework(message, color);
+                    }, i * 1000);
+                }
+            }
+            
+            triggerRandomFireworks(count = 10) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const x = Math.random() * this.canvas.width;
+                        const y = Math.random() * this.canvas.height;
+                        const color = this.nameColors[Math.floor(Math.random() * this.nameColors.length)];
+                        const message = "🎆";
+                        
+                        this.createNameFirework(message, color);
+                    }, i * 200);
+                }
+            }
+        }
+        
+        // ==================== 优化后的游戏系统 ====================
+        class GameSystem {
+            constructor() {
+                this.currentGame = null;
+                this.gameInterval = null;
+                this.gameScore = 0;
+                this.gameLevel = 1;
+                this.gameActive = false;
+                this.linesCleared = 0;
+                this.redpacketsCaught = 0;
+                this.comboCount = 0;
+                this.gameTimer = 60;
+                this.timerInterval = null;
+                this.bestScores = this.loadBestScores();
+                
+                // 游戏配置
+                this.games = {
+                    tetris: {
+                        title: "俄罗斯方块",
+                        instructions: "使用按钮控制方块移动和旋转，填满一行即可消除得分。",
+                        init: this.initTetris.bind(this),
+                        bestScoreKey: "tetris_best"
+                    },
+                    redpacket: {
+                        title: "红包接接乐",
+                        instructions: "移动鼠标接住掉落的红包，红包缓慢下落，接到普通红包得10分，大红包得50分，炸弹红包扣20分。",
+                        init: this.initRedPacket.bind(this),
+                        bestScoreKey: "redpacket_best"
+                    },
+                    riddle: {
+                        title: "猜灯谜",
+                        instructions: "猜猜下面的灯谜是什么？输入答案并点击提交。",
+                        init: this.initRiddle.bind(this),
+                        bestScoreKey: "riddle_best"
+                    },
+                    fruit: {
+                        title: "水果消除",
+                        instructions: "点击至少3个相邻的相同水果连接消除，连击越多得分越高。",
+                        init: this.initFruitElimination.bind(this),
+                        bestScoreKey: "fruit_best"
+                    },
+                    memory: {
+                        title: "记忆挑战",
+                        instructions: "记住卡片的位置和图案，找出所有匹配的卡片对。",
+                        init: this.initMemory.bind(this),
+                        bestScoreKey: "memory_best"
+                    }
+                };
+                
+                this.updateGameButtons();
+            }
+            
+            loadBestScores() {
+                const scores = {};
+                for (const gameKey in this.games) {
+                    const saved = localStorage.getItem(this.games[gameKey].bestScoreKey);
+                    if (saved) {
+                        scores[gameKey] = parseInt(saved);
+                    } else {
+                        scores[gameKey] = 0;
+                    }
+                }
+                return scores;
+            }
+            
+            saveBestScore(gameKey, score) {
+                if (score > this.bestScores[gameKey]) {
+                    this.bestScores[gameKey] = score;
+                    localStorage.setItem(this.games[gameKey].bestScoreKey, score.toString());
+                    return true;
+                }
+                return false;
+            }
+            
+            updateGameButtons() {
+                const gameGrid = document.querySelector('.game-grid');
+                if (gameGrid) {
+                    gameGrid.innerHTML = `
+                        <button class="game-btn" data-game="tetris">
+                            <i class="fas fa-th-large"></i>俄罗斯方块
+                        </button>
+                        <button class="game-btn" data-game="redpacket">
+                            <i class="fas fa-money-bill-wave"></i>红包接接乐
+                        </button>
+                        <button class="game-btn" data-game="riddle">
+                            <i class="fas fa-lightbulb"></i>猜灯谜
+                        </button>
+                        <button class="game-btn" data-game="fruit">
+                            <i class="fas fa-apple-alt"></i>水果消除
+                        </button>
+                        <button class="game-btn" data-game="memory">
+                            <i class="fas fa-brain"></i>记忆挑战
+                        </button>
+                        <button class="game-btn" data-game="leaderboard">
+                            <i class="fas fa-trophy"></i>排行榜
+                        </button>
+                    `;
+                    
+                    // 重新绑定事件
+                    document.querySelectorAll('.game-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const gameType = e.currentTarget.dataset.game;
+                            if (gameType === 'leaderboard') {
+                                this.showLeaderboard();
+                            } else {
+                                this.openGame(gameType);
+                            }
                         });
+                    });
+                }
+            }
+            
+            openGame(gameType) {
+                const game = this.games[gameType];
+                if (!game) return;
+                
+                // 检查是否需要确认重新开始
+                if (this.currentGame === gameType && this.gameActive) {
+                    this.showConfirmRestart(gameType);
+                    return;
+                }
+                
+                this.currentGame = gameType;
+                this.gameScore = 0;
+                this.gameLevel = 1;
+                this.gameActive = false;
+                this.linesCleared = 0;
+                this.redpacketsCaught = 0;
+                this.comboCount = 0;
+                this.gameTimer = 60;
+                
+                // 更新游戏标题和说明
+                document.getElementById('game-title').textContent = game.title;
+                document.getElementById('game-instructions').textContent = game.instructions;
+                
+                // 显示最佳成绩
+                const bestScore = this.bestScores[gameType] || 0;
+                document.getElementById('game-score').innerHTML = `
+                    <div class="game-best-score">
+                        最佳成绩: <span id="best-score-value">${bestScore}</span>
+                    </div>
+                    <div>当前得分: <span id="score-value">0</span></div>
+                `;
+                
+                // 显示游戏信息区域
+                document.getElementById('game-info').style.display = 'flex';
+                document.getElementById('game-score-value').textContent = '0';
+                document.getElementById('game-level-value').textContent = '1';
+                document.getElementById('game-time-value').textContent = '60';
+                
+                // 清空游戏区域
+                const gameArea = document.getElementById('game-area');
+                gameArea.innerHTML = '';
+                
+                // 显示控制按钮
+                document.getElementById('game-controls').style.display = 'flex';
+                document.getElementById('game-score').style.display = 'block';
+                
+                // 初始化游戏
+                game.init();
+                
+                // 打开游戏弹窗
+                document.getElementById('game-modal').style.display = 'flex';
+            }
+            
+            showConfirmRestart(gameType) {
+                document.getElementById('confirm-message').innerHTML = 
+                    `当前游戏正在进行中，您的当前得分为：${this.gameScore}<br>
+                     重新开始将丢失当前进度，确定要重新开始吗？`;
+                
+                const confirmModal = document.getElementById('confirm-modal');
+                confirmModal.style.display = 'flex';
+                
+                document.getElementById('confirm-restart-yes').onclick = () => {
+                    confirmModal.style.display = 'none';
+                    this.closeGame();
+                    setTimeout(() => this.openGame(gameType), 100);
+                };
+                
+                document.getElementById('confirm-restart-no').onclick = () => {
+                    confirmModal.style.display = 'none';
+                };
+            }
+            
+            showLeaderboard() {
+                const leaderboardContent = document.getElementById('leaderboard-content');
+                let leaderboardHTML = '';
+                
+                let hasRecords = false;
+                for (const gameKey in this.games) {
+                    if (gameKey === 'leaderboard') continue;
+                    
+                    const game = this.games[gameKey];
+                    const bestScore = this.bestScores[gameKey] || 0;
+                    
+                    if (bestScore > 0) {
+                        hasRecords = true;
+                        leaderboardHTML += `
+                            <div class="leaderboard-item">
+                                <div class="leaderboard-game">${game.title}</div>
+                                <div class="leaderboard-score">${bestScore} 分</div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                if (!hasRecords) {
+                    leaderboardHTML = '<div class="no-record">暂无游戏记录，快去玩游戏吧！</div>';
+                }
+                
+                leaderboardContent.innerHTML = leaderboardHTML;
+                document.getElementById('leaderboard-modal').style.display = 'flex';
+                
+                document.getElementById('close-leaderboard').onclick = () => {
+                    document.getElementById('leaderboard-modal').style.display = 'none';
+                };
+            }
+            
+            closeGame() {
+                this.gameActive = false;
+                if (this.gameInterval) {
+                    clearInterval(this.gameInterval);
+                    this.gameInterval = null;
+                }
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+                document.getElementById('game-modal').style.display = 'none';
+            }
+            
+            updateScore(points) {
+                this.gameScore += points;
+                document.getElementById('score-value').textContent = this.gameScore;
+                document.getElementById('game-score-value').textContent = this.gameScore;
+                
+                // 检查是否突破最佳成绩
+                if (this.gameScore > this.bestScores[this.currentGame]) {
+                    document.getElementById('best-score-value').classList.add('score-break');
+                    document.getElementById('best-score-value').textContent = this.gameScore;
+                    setTimeout(() => {
+                        document.getElementById('best-score-value').classList.remove('score-break');
+                    }, 1500);
+                }
+            }
+            
+            updateLevel() {
+                document.getElementById('game-level-value').textContent = this.gameLevel;
+            }
+            
+            updateTimer() {
+                document.getElementById('game-time-value').textContent = this.gameTimer;
+            }
+            
+            showGameOver(message) {
+                const gameArea = document.getElementById('game-area');
+                const gameOverModal = document.createElement('div');
+                gameOverModal.className = 'game-over-modal';
+                gameOverModal.style.display = 'block';
+                
+                // 保存最佳成绩
+                const newRecord = this.saveBestScore(this.currentGame, this.gameScore);
+                
+                let statsHTML = '';
+                if (this.currentGame === 'tetris') {
+                    statsHTML = `
+                        <div class="game-over-stats">
+                            <div>当前得分: ${this.gameScore}</div>
+                            <div>最高纪录: ${this.bestScores[this.currentGame]}</div>
+                            <div>消除行数: ${this.linesCleared}</div>
+                            <div>等级: ${this.gameLevel}</div>
+                            ${newRecord ? '<div style="color:#4ECDC4; margin-top:10px;">🎉 打破纪录！</div>' : ''}
+                        </div>
+                    `;
+                } else if (this.currentGame === 'redpacket') {
+                    statsHTML = `
+                        <div class="game-over-stats">
+                            <div>当前得分: ${this.gameScore}</div>
+                            <div>最高纪录: ${this.bestScores[this.currentGame]}</div>
+                            <div>接住红包: ${this.redpacketsCaught}</div>
+                            <div>连击奖励: ${this.comboCount}次</div>
+                            ${newRecord ? '<div style="color:#4ECDC4; margin-top:10px;">🎉 打破纪录！</div>' : ''}
+                        </div>
+                    `;
+                } else {
+                    statsHTML = `
+                        <div class="game-over-stats">
+                            <div>当前得分: ${this.gameScore}</div>
+                            <div>最高纪录: ${this.bestScores[this.currentGame]}</div>
+                            ${newRecord ? '<div style="color:#4ECDC4; margin-top:10px;">🎉 打破纪录！</div>' : ''}
+                        </div>
+                    `;
+                }
+                
+                gameOverModal.innerHTML = `
+                    <h2 class="game-over-title">${message}</h2>
+                    ${statsHTML}
+                    <button class="game-over-btn" id="game-over-restart">重新开始</button>
+                `;
+                
+                gameArea.appendChild(gameOverModal);
+                
+                document.getElementById('game-over-restart').onclick = () => {
+                    gameArea.removeChild(gameOverModal);
+                    this.closeGame();
+                    this.openGame(this.currentGame);
+                };
+            }
+            
+            // ========== 修复的俄罗斯方块游戏 ==========
+            initTetris() {
+                const gameArea = document.getElementById('game-area');
+                gameArea.innerHTML = `
+                    <canvas id="tetris-canvas" width="300" height="600"></canvas>
+                    <div class="tetris-controls">
+                        <div style="width:100%; text-align:center; margin-bottom:10px;">
+                            <button class="tetris-control-btn tetris-rotate-btn" id="tetris-rotate">
+                                <i class="fas fa-redo-alt"></i> 旋转
+                            </button>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <button class="tetris-control-btn" id="tetris-left">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <button class="tetris-control-btn" id="tetris-down">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                            <button class="tetris-control-btn" id="tetris-right">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div style="width:100%; text-align:center;">
+                            <button class="tetris-control-btn tetris-drop-btn" id="tetris-drop">
+                                <i class="fas fa-arrow-circle-down"></i> 瞬降
+                            </button>
+                        </div>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">等级</div>
+                            <div class="stat-value" id="tetris-level">1</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">行数</div>
+                            <div class="stat-value" id="tetris-lines">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">速度</div>
+                            <div class="stat-value" id="tetris-speed">1</div>
+                        </div>
+                    </div>
+                `;
+                
+                // 俄罗斯方块游戏逻辑
+                const canvas = document.getElementById('tetris-canvas');
+                const ctx = canvas.getContext('2d');
+                const grid = 30;
+                const board = [];
+                const colors = ['#FF3B1F', '#4ECDC4', '#FFC857', '#45B7D1', '#E6002D', '#96CEB4', '#9B59B6'];
+                
+                // 初始化游戏板
+                for (let row = 0; row < 20; row++) {
+                    board[row] = [];
+                    for (let col = 0; col < 10; col++) {
+                        board[row][col] = 0;
+                    }
+                }
+                
+                // 方块形状
+                const shapes = [
+                    [[1,1,1,1]], // I
+                    [[1,1],[1,1]], // O
+                    [[0,1,0],[1,1,1]], // T
+                    [[1,0,0],[1,1,1]], // J
+                    [[0,0,1],[1,1,1]], // L
+                    [[0,1,1],[1,1,0]], // S
+                    [[1,1,0],[0,1,1]]  // Z
+                ];
+                
+                let currentPiece = {
+                    shape: shapes[Math.floor(Math.random() * shapes.length)],
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    x: 3,
+                    y: 0
+                };
+                
+                let dropCounter = 0;
+                let dropInterval = 1000; // 初始下落速度
+                let lastTime = 0;
+                let moveCooldown = 0;
+                
+                // 绘制游戏
+                function draw() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // 绘制背景网格
+                    for (let row = 0; row < 20; row++) {
+                        for (let col = 0; col < 10; col++) {
+                            ctx.fillStyle = board[row][col] ? colors[board[row][col] - 1] : 'rgba(255,255,255,0.05)';
+                            ctx.fillRect(col * grid, row * grid, grid-1, grid-1);
+                            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                            ctx.strokeRect(col * grid, row * grid, grid, grid);
+                        }
+                    }
+                    
+                    // 绘制当前方块
+                    ctx.fillStyle = currentPiece.color;
+                    for (let row = 0; row < currentPiece.shape.length; row++) {
+                        for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                            if (currentPiece.shape[row][col]) {
+                                ctx.fillRect(
+                                    (currentPiece.x + col) * grid,
+                                    (currentPiece.y + row) * grid,
+                                    grid-1, grid-1
+                                );
+                                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                                ctx.strokeRect(
+                                    (currentPiece.x + col) * grid,
+                                    (currentPiece.y + row) * grid,
+                                    grid, grid
+                                );
+                            }
+                        }
+                    }
+                }
+                
+                // 碰撞检测
+                function checkCollision() {
+                    for (let row = 0; row < currentPiece.shape.length; row++) {
+                        for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                            if (currentPiece.shape[row][col]) {
+                                const newX = currentPiece.x + col;
+                                const newY = currentPiece.y + row;
+                                
+                                if (newX < 0 || newX >= 10 || newY >= 20) {
+                                    return true;
+                                }
+                                
+                                if (newY >= 0 && board[newY][newX]) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                }
+                
+                // 合并方块到游戏板
+                function mergePiece() {
+                    for (let row = 0; row < currentPiece.shape.length; row++) {
+                        for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                            if (currentPiece.shape[row][col]) {
+                                const boardX = currentPiece.x + col;
+                                const boardY = currentPiece.y + row;
+                                
+                                if (boardY >= 0) {
+                                    board[boardY][boardX] = colors.indexOf(currentPiece.color) + 1;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 消除完整的行
+                function removeLines() {
+                    let linesRemoved = 0;
+                    
+                    for (let row = 19; row >= 0; row--) {
+                        let isLineFull = true;
+                        for (let col = 0; col < 10; col++) {
+                            if (!board[row][col]) {
+                                isLineFull = false;
+                                break;
+                            }
+                        }
+                        
+                        if (isLineFull) {
+                            // 消除动画
+                            for (let col = 0; col < 10; col++) {
+                                ctx.fillStyle = '#FFFF00';
+                                ctx.fillRect(col * grid, row * grid, grid-1, grid-1);
+                            }
+                            
+                            // 消除行
+                            for (let r = row; r > 0; r--) {
+                                for (let col = 0; col < 10; col++) {
+                                    board[r][col] = board[r-1][col];
+                                }
+                            }
+                            
+                            for (let col = 0; col < 10; col++) {
+                                board[0][col] = 0;
+                            }
+                            
+                            linesRemoved++;
+                            row++;
+                        }
+                    }
+                    
+                    if (linesRemoved > 0) {
+                        this.linesCleared += linesRemoved;
+                        let points = 0;
+                        
+                        // 分数计算
+                        switch(linesRemoved) {
+                            case 1: points = 100; break;
+                            case 2: points = 200; break;
+                            case 3: points = 400; break;
+                            case 4: points = 800; break;
+                        }
+                        
+                        this.updateScore(points);
+                        
+                        // 等级提升
+                        const newLevel = Math.floor(this.linesCleared / 10) + 1;
+                        if (newLevel > this.gameLevel) {
+                            this.gameLevel = newLevel;
+                            this.updateLevel();
+                            dropInterval = Math.max(100, 1000 - (this.gameLevel - 1) * 100);
+                            
+                            // 更新显示
+                            document.getElementById('tetris-level').textContent = this.gameLevel;
+                            document.getElementById('tetris-speed').textContent = Math.round(1000 / dropInterval);
+                        }
+                        
+                        document.getElementById('tetris-lines').textContent = this.linesCleared;
+                    }
+                }
+                
+                // 旋转方块
+                function rotatePiece() {
+                    const rotated = [];
+                    for (let i = 0; i < currentPiece.shape[0].length; i++) {
+                        rotated[i] = [];
+                        for (let j = currentPiece.shape.length - 1; j >= 0; j--) {
+                            rotated[i][currentPiece.shape.length - 1 - j] = currentPiece.shape[j][i];
+                        }
+                    }
+                    
+                    const oldShape = currentPiece.shape;
+                    currentPiece.shape = rotated;
+                    if (checkCollision()) {
+                        currentPiece.shape = oldShape;
+                    }
+                }
+                
+                // 游戏循环
+                const gameLoop = (time = 0) => {
+                    if (!this.gameActive) return;
+                    
+                    const deltaTime = time - lastTime;
+                    lastTime = time;
+                    
+                    // 冷却计时
+                    if (moveCooldown > 0) {
+                        moveCooldown -= deltaTime;
+                    }
+                    
+                    dropCounter += deltaTime;
+                    if (dropCounter > dropInterval) {
+                        currentPiece.y++;
+                        
+                        if (checkCollision()) {
+                            currentPiece.y--;
+                            mergePiece();
+                            removeLines.call(this);
+                            
+                            // 生成新方块
+                            currentPiece = {
+                                shape: shapes[Math.floor(Math.random() * shapes.length)],
+                                color: colors[Math.floor(Math.random() * colors.length)],
+                                x: 3,
+                                y: 0
+                            };
+                            
+                            // 检查游戏结束
+                            if (checkCollision()) {
+                                this.gameActive = false;
+                                this.showGameOver('游戏结束!');
+                                return;
+                            }
+                        }
+                        
+                        dropCounter = 0;
+                    }
+                    
+                    draw();
+                    requestAnimationFrame((t) => gameLoop.call(this, t));
+                };
+                
+                // 按钮控制
+                document.getElementById('tetris-left').onclick = () => {
+                    if (!this.gameActive || moveCooldown > 0) return;
+                    currentPiece.x--;
+                    if (checkCollision()) currentPiece.x++;
+                    draw();
+                    moveCooldown = 100;
+                };
+                
+                document.getElementById('tetris-right').onclick = () => {
+                    if (!this.gameActive || moveCooldown > 0) return;
+                    currentPiece.x++;
+                    if (checkCollision()) currentPiece.x--;
+                    draw();
+                    moveCooldown = 100;
+                };
+                
+                document.getElementById('tetris-down').onclick = () => {
+                    if (!this.gameActive || moveCooldown > 0) return;
+                    currentPiece.y++;
+                    if (checkCollision()) {
+                        currentPiece.y--;
+                        mergePiece();
+                        removeLines.call(this);
+                        currentPiece = {
+                            shape: shapes[Math.floor(Math.random() * shapes.length)],
+                            color: colors[Math.floor(Math.random() * colors.length)],
+                            x: 3,
+                            y: 0
+                        };
+                        if (checkCollision()) {
+                            this.gameActive = false;
+                            this.showGameOver('游戏结束!');
+                        }
+                    }
+                    draw();
+                    moveCooldown = 100;
+                };
+                
+                document.getElementById('tetris-rotate').onclick = () => {
+                    if (!this.gameActive || moveCooldown > 0) return;
+                    rotatePiece();
+                    draw();
+                    moveCooldown = 200;
+                };
+                
+                document.getElementById('tetris-drop').onclick = () => {
+                    if (!this.gameActive) return;
+                    while (!checkCollision()) {
+                        currentPiece.y++;
+                    }
+                    currentPiece.y--;
+                    mergePiece();
+                    removeLines.call(this);
+                    currentPiece = {
+                        shape: shapes[Math.floor(Math.random() * shapes.length)],
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        x: 3,
+                        y: 0
+                    };
+                    if (checkCollision()) {
+                        this.gameActive = false;
+                        this.showGameOver('游戏结束!');
+                    }
+                    draw();
+                };
+                
+                // 开始游戏
+                document.getElementById('game-start').onclick = () => {
+                    this.gameActive = true;
+                    lastTime = 0;
+                    gameLoop.call(this);
+                };
+                
+                document.getElementById('game-restart').onclick = () => {
+                    this.closeGame();
+                    this.openGame('tetris');
+                };
+                
+                // 初始绘制
+                draw();
+            }
+            
+            // ========== 红包接接乐游戏 ==========
+            initRedPacket() {
+                const gameArea = document.getElementById('game-area');
+                gameArea.innerHTML = `
+                    <div class="redpacket-container" id="redpacket-container">
+                        <div class="basket" id="basket"></div>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">连击</div>
+                            <div class="stat-value" id="combo-count">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">红包</div>
+                            <div class="stat-value" id="packets-caught">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">时间</div>
+                            <div class="stat-value" id="packet-timer">60</div>
+                        </div>
+                    </div>
+                `;
+                
+                const container = document.getElementById('redpacket-container');
+                const basket = document.getElementById('basket');
+                let basketX = container.offsetWidth / 2 - 50;
+                let redpackets = [];
+                let missed = 0;
+                let combo = 0;
+                let lastCaughtTime = 0;
+                
+                // 控制篮子
+                container.onmousemove = (e) => {
+                    if (!this.gameActive) return;
+                    
+                    const rect = container.getBoundingClientRect();
+                    basketX = e.clientX - rect.left - 50;
+                    if (basketX < 0) basketX = 0;
+                    if (basketX > container.offsetWidth - 100) basketX = container.offsetWidth - 100;
+                    basket.style.left = basketX + 'px';
+                };
+                
+                // 触摸控制
+                container.addEventListener('touchmove', (e) => {
+                    if (!this.gameActive) return;
+                    e.preventDefault();
+                    
+                    const touch = e.touches[0];
+                    const rect = container.getBoundingClientRect();
+                    basketX = touch.clientX - rect.left - 50;
+                    if (basketX < 0) basketX = 0;
+                    if (basketX > container.offsetWidth - 100) basketX = container.offsetWidth - 100;
+                    basket.style.left = basketX + 'px';
+                });
+                
+                function createRedPacket() {
+                    const redpacket = document.createElement('div');
+                    redpacket.className = 'redpacket';
+                    
+                    // 随机红包类型
+                    const type = Math.random();
+                    if (type < 0.7) {
+                        // 普通红包 70%
+                        redpacket.textContent = '福';
+                    } else if (type < 0.9) {
+                        // 大红包 20%
+                        redpacket.className += ' big';
+                        redpacket.textContent = '財';
+                    } else {
+                        // 炸弹红包 10%
+                        redpacket.className += ' bomb';
+                        redpacket.textContent = '💣';
+                    }
+                    
+                    redpacket.style.left = Math.random() * (container.offsetWidth - 60) + 'px';
+                    redpacket.style.top = '0px';
+                    
+                    redpacket.onclick = () => {
+                        if (!this.gameActive) return;
+                        
+                        const now = Date.now();
+                        if (now - lastCaughtTime < 1000) {
+                            combo++;
+                            if (combo % 5 === 0) {
+                                this.updateScore(50); // 连击奖励
+                                showMessage(`连击x${combo}! +50分`);
+                            }
+                        } else {
+                            combo = 1;
+                        }
+                        lastCaughtTime = now;
+                        
+                        let points = 0;
+                        if (redpacket.classList.contains('big')) {
+                            points = 50;
+                        } else if (redpacket.classList.contains('bomb')) {
+                            points = -20;
+                        } else {
+                            points = 10;
+                        }
+                        
+                        if (points > 0) {
+                            this.redpacketsCaught++;
+                            document.getElementById('packets-caught').textContent = this.redpacketsCaught;
+                        }
+                        
+                        this.updateScore(points);
+                        document.getElementById('combo-count').textContent = combo;
+                        
+                        // 红包消失动画
+                        redpacket.style.transition = 'all 0.3s';
+                        redpacket.style.transform = 'scale(0)';
+                        redpacket.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            if (redpacket.parentNode) {
+                                container.removeChild(redpacket);
+                            }
+                            redpackets = redpackets.filter(rp => rp !== redpacket);
+                        }, 300);
+                    };
+                    
+                    container.appendChild(redpacket);
+                    redpackets.push({
+                        element: redpacket,
+                        type: redpacket.classList.contains('big') ? 'big' : 
+                              redpacket.classList.contains('bomb') ? 'bomb' : 'normal',
+                        x: parseFloat(redpacket.style.left),
+                        y: 0,
+                        speed: 1 + Math.random() * 1.5  // 降低下落速度
+                    });
+                }
+                
+                function updateRedPackets() {
+                    if (!this.gameActive) return;
+                    
+                    for (let i = redpackets.length - 1; i >= 0; i--) {
+                        const rp = redpackets[i];
+                        rp.y += rp.speed;  // 使用降低后的速度
+                        rp.element.style.top = rp.y + 'px';
+                        
+                        // 减少左右偏移
+                        rp.x += (Math.random() - 0.5) * 1;
+                        if (rp.x < 0) rp.x = 0;
+                        if (rp.x > container.offsetWidth - 60) rp.x = container.offsetWidth - 60;
+                        rp.element.style.left = rp.x + 'px';
+                        
+                        // 检查是否接到
+                        const rpLeft = rp.x;
+                        const rpRight = rp.x + (rp.element.classList.contains('big') ? 80 : 60);
+                        const basketLeft = basketX;
+                        const basketRight = basketX + 100;
+                        
+                        if (rp.y > 350 && rp.y < 400 && 
+                            rpRight > basketLeft && rpLeft < basketRight) {
+                            // 接到红包
+                            rp.element.click();
+                        } else if (rp.y > 400) {
+                            // 错过红包
+                            missed++;
+                            if (missed >= 10) {
+                                this.showGameOver('游戏结束!');
+                                this.gameActive = false;
+                            }
+                            container.removeChild(rp.element);
+                            redpackets.splice(i, 1);
+                        }
+                    }
+                }
+                
+                function gameLoop() {
+                    if (!this.gameActive) return;
+                    
+                    // 减少生成频率
+                    if (Math.random() < 0.05) {  // 从0.1改为0.05
+                        createRedPacket.call(this);
+                    }
+                    
+                    updateRedPackets.call(this);
+                }
+                
+                function updateTimer() {
+                    if (!this.gameActive) return;
+                    
+                    this.gameTimer--;
+                    this.updateTimer();
+                    document.getElementById('packet-timer').textContent = this.gameTimer;
+                    
+                    if (this.gameTimer <= 0) {
+                        this.showGameOver('时间到!');
+                        this.gameActive = false;
+                    }
+                }
+                
+                document.getElementById('game-start').onclick = () => {
+                    this.gameActive = true;
+                    redpackets.forEach(rp => container.removeChild(rp.element));
+                    redpackets = [];
+                    missed = 0;
+                    combo = 0;
+                    this.gameScore = 0;
+                    this.redpacketsCaught = 0;
+                    this.gameTimer = 60;
+                    this.updateScore(0);
+                    this.updateTimer();
+                    
+                    document.getElementById('packets-caught').textContent = '0';
+                    document.getElementById('combo-count').textContent = '0';
+                    
+                    this.gameInterval = setInterval(() => gameLoop.call(this), 50);
+                    this.timerInterval = setInterval(() => updateTimer.call(this), 1000);
+                };
+                
+                document.getElementById('game-restart').onclick = () => {
+                    this.closeGame();
+                    this.openGame('redpacket');
+                };
+            }
+            
+            // ========== 猜灯谜游戏 ==========
+            initRiddle() {
+                const gameArea = document.getElementById('game-area');
+                gameArea.innerHTML = `
+                    <div class="riddle-container">
+                        <div class="riddle-question" id="riddle-question"></div>
+                        <input type="text" class="riddle-answer" id="riddle-answer" placeholder="输入你的答案">
+                        <button class="game-control-btn" id="riddle-submit" style="margin-top: 15px;">提交答案</button>
+                        <div class="riddle-feedback" id="riddle-feedback"></div>
+                    </div>
+                `;
+                
+                const riddles = [
+                    { question: "新年钟声（打一成语）", answer: "一鸣惊人" },
+                    { question: "除夕之夜（打一字）", answer: "多" },
+                    { question: "新年快乐（打一外国城市）", answer: "维也纳" },
+                    { question: "春节三日（打一字）", answer: "人" },
+                    { question: "新年第一月（打一节气）", answer: "元旦" },
+                    { question: "除夕守岁（打一成语）", answer: "送旧迎新" },
+                    { question: "恭贺新禧（打一画家）", answer: "祝大年" },
+                    { question: "春节更换年画（打一成语）", answer: "弃旧图新" }
+                ];
+                
+                let currentRiddleIndex = 0;
+                let riddlesAnswered = 0;
+                
+                function loadNextRiddle() {
+                    if (currentRiddleIndex >= riddles.length) {
+                        currentRiddleIndex = 0;
+                    }
+                    
+                    const riddle = riddles[currentRiddleIndex];
+                    document.getElementById('riddle-question').textContent = riddle.question;
+                    document.getElementById('riddle-answer').value = '';
+                    document.getElementById('riddle-feedback').textContent = '';
+                }
+                
+                document.getElementById('riddle-submit').onclick = () => {
+                    if (!this.gameActive) return;
+                    
+                    const userAnswer = document.getElementById('riddle-answer').value.trim();
+                    const feedback = document.getElementById('riddle-feedback');
+                    
+                    if (!userAnswer) {
+                        feedback.textContent = "请输入答案！";
+                        feedback.style.color = "#FFC857";
+                        return;
+                    }
+                    
+                    const correctAnswer = riddles[currentRiddleIndex].answer;
+                    if (userAnswer === correctAnswer) {
+                        feedback.textContent = "恭喜你，答对了！+20分";
+                        feedback.style.color = "#4ECDC4";
+                        this.updateScore(20);
+                        riddlesAnswered++;
+                        
+                        if (riddlesAnswered >= 5) {
+                            this.updateScore(50); // 额外奖励
+                            this.showGameOver('猜灯谜大师!');
+                            this.gameActive = false;
+                        } else {
+                            setTimeout(() => {
+                                currentRiddleIndex++;
+                                loadNextRiddle();
+                            }, 1500);
+                        }
+                    } else {
+                        feedback.textContent = "答案不正确，再试试看！";
+                        feedback.style.color = "#FF3B1F";
+                    }
+                };
+                
+                document.getElementById('game-start').onclick = () => {
+                    this.gameActive = true;
+                    this.gameScore = 0;
+                    this.updateScore(0);
+                    riddlesAnswered = 0;
+                    currentRiddleIndex = 0;
+                    loadNextRiddle();
+                };
+                
+                document.getElementById('game-restart').onclick = () => {
+                    this.closeGame();
+                    this.openGame('riddle');
+                };
+                
+                loadNextRiddle();
+            }
+            
+            // ========== 水果消除游戏 ==========
+            initFruitElimination() {
+                const gameArea = document.getElementById('game-area');
+                gameArea.innerHTML = `
+                    <div class="fruit-elimination-grid" id="fruit-grid"></div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">分数</div>
+                            <div class="stat-value" id="fruit-score">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">连击</div>
+                            <div class="stat-value" id="fruit-combo">1</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">剩余</div>
+                            <div class="stat-value" id="fruit-remaining">64</div>
+                        </div>
+                    </div>
+                `;
+                
+                const grid = document.getElementById('fruit-grid');
+                const fruits = ['🍎', '🍊', '🍇', '🍓', '🍉', '🍌', '🥝', '🍒'];
+                let cells = [];
+                let selectedCells = [];
+                let score = 0;
+                let combo = 1;
+                let remaining = 64;
+                
+                function initGrid() {
+                    grid.innerHTML = '';
+                    cells = [];
+                    selectedCells = [];
+                    score = 0;
+                    combo = 1;
+                    remaining = 64;
+                    
+                    for (let i = 0; i < 64; i++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'fruit-cell';
+                        cell.textContent = fruits[Math.floor(Math.random() * fruits.length)];
+                        cell.dataset.index = i;
+                        
+                        cell.onclick = () => {
+                            if (!this.gameActive) return;
+                            
+                            const index = parseInt(cell.dataset.index);
+                            
+                            // 如果已经选中，则取消选择
+                            const selectedIndex = selectedCells.indexOf(index);
+                            if (selectedIndex > -1) {
+                                selectedCells.splice(selectedIndex, 1);
+                                cell.classList.remove('selected');
+                            } else {
+                                // 如果选择相邻的相同水果，或这是第一个选择
+                                if (selectedCells.length === 0 || 
+                                    (selectedCells.length > 0 && 
+                                     cell.textContent === cells[selectedCells[0]].textContent &&
+                                     isAdjacent(index, selectedCells[selectedCells.length - 1]))) {
+                                    
+                                    selectedCells.push(index);
+                                    cell.classList.add('selected');
+                                }
+                            }
+                            
+                            // 如果选择了3个或以上，消除
+                            if (selectedCells.length >= 3) {
+                                eliminateFruits();
+                            }
+                        };
+                        
+                        grid.appendChild(cell);
+                        cells.push(cell);
+                    }
+                    
+                    updateDisplay();
+                }
+                
+                function isAdjacent(index1, index2) {
+                    const row1 = Math.floor(index1 / 8);
+                    const col1 = index1 % 8;
+                    const row2 = Math.floor(index2 / 8);
+                    const col2 = index2 % 8;
+                    
+                    return Math.abs(row1 - row2) <= 1 && Math.abs(col1 - col2) <= 1;
+                }
+                
+                function eliminateFruits() {
+                    if (selectedCells.length < 3) return;
+                    
+                    // 计算得分
+                    const points = selectedCells.length * 10 * combo;
+                    score += points;
+                    remaining -= selectedCells.length;
+                    
+                    this.updateScore(points);
+                    document.getElementById('fruit-score').textContent = score;
+                    document.getElementById('fruit-remaining').textContent = remaining;
+                    
+                    // 增加连击
+                    if (selectedCells.length >= 5) {
+                        combo++;
+                        document.getElementById('fruit-combo').textContent = combo;
+                        showMessage(`连击x${combo}!`, 1000);
+                    }
+                    
+                    // 消除动画
+                    selectedCells.forEach(index => {
+                        cells[index].classList.add('eliminated');
+                    });
+                    
+                    setTimeout(() => {
+                        // 移除消除的格子
+                        selectedCells.sort((a, b) => b - a).forEach(index => {
+                            cells.splice(index, 1);
+                        });
+                        
+                        // 重新生成格子
+                        const newCount = selectedCells.length;
+                        for (let i = 0; i < newCount; i++) {
+                            const cell = document.createElement('div');
+                            cell.className = 'fruit-cell';
+                            cell.textContent = fruits[Math.floor(Math.random() * fruits.length)];
+                            cell.dataset.index = cells.length;
+                            
+                            cell.onclick = () => {
+                                if (!this.gameActive) return;
+                                
+                                const index = parseInt(cell.dataset.index);
+                                
+                                // 如果已经选中，则取消选择
+                                const selectedIndex = selectedCells.indexOf(index);
+                                if (selectedIndex > -1) {
+                                    selectedCells.splice(selectedIndex, 1);
+                                    cell.classList.remove('selected');
+                                } else {
+                                    // 如果选择相邻的相同水果，或这是第一个选择
+                                    if (selectedCells.length === 0 || 
+                                        (selectedCells.length > 0 && 
+                                         cell.textContent === cells[selectedCells[0]].textContent &&
+                                         isAdjacent(index, selectedCells[selectedCells.length - 1]))) {
+                                        
+                                        selectedCells.push(index);
+                                        cell.classList.add('selected');
+                                    }
+                                }
+                                
+                                // 如果选择了3个或以上，消除
+                                if (selectedCells.length >= 3) {
+                                    eliminateFruits.call(this);
+                                }
+                            };
+                            
+                            cells.push(cell);
+                        }
+                        
+                        // 重新渲染网格
+                        renderGrid();
+                        selectedCells = [];
+                        
+                        // 检查游戏是否结束
+                        if (remaining <= 0) {
+                            const bonus = combo * 100;
+                            this.updateScore(bonus);
+                            this.showGameOver('游戏完成!');
+                            this.gameActive = false;
+                        }
+                    }, 300);
+                }
+                
+                function renderGrid() {
+                    grid.innerHTML = '';
+                    cells.forEach((cell, index) => {
+                        cell.dataset.index = index;
+                        grid.appendChild(cell);
+                    });
+                }
+                
+                function updateDisplay() {
+                    document.getElementById('fruit-score').textContent = score;
+                    document.getElementById('fruit-combo').textContent = combo;
+                    document.getElementById('fruit-remaining').textContent = remaining;
+                }
+                
+                document.getElementById('game-start').onclick = () => {
+                    this.gameActive = true;
+                    this.gameScore = 0;
+                    this.updateScore(0);
+                    initGrid.call(this);
+                };
+                
+                document.getElementById('game-restart').onclick = () => {
+                    this.closeGame();
+                    this.openGame('fruit');
+                };
+                
+                // 初始化网格
+                initGrid.call(this);
+            }
+            
+            // ========== 记忆挑战游戏 ==========
+            initMemory() {
+                const gameArea = document.getElementById('game-area');
+                gameArea.innerHTML = '<div class="memory-grid" id="memory-grid"></div>';
+                
+                const symbols = ['🎉', '🎆', '🎊', '✨', '🏮', '🧧', '🥂', '🎁'];
+                const cards = [...symbols, ...symbols]; // 每对两个
+                
+                // 打乱卡片
+                for (let i = cards.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [cards[i], cards[j]] = [cards[j], cards[i]];
+                }
+                
+                const grid = document.getElementById('memory-grid');
+                let flippedCards = [];
+                let matchedPairs = 0;
+                let canFlip = true;
+                let moves = 0;
+                
+                // 创建卡片
+                cards.forEach((symbol, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'memory-card';
+                    card.dataset.symbol = symbol;
+                    card.dataset.index = index;
+                    
+                    card.onclick = () => {
+                        if (!this.gameActive || !canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                            return;
+                        }
+                        
+                        card.classList.add('flipped');
+                        card.textContent = symbol;
+                        flippedCards.push(card);
+                        moves++;
+                        
+                        if (flippedCards.length === 2) {
+                            canFlip = false;
+                            
+                            const [card1, card2] = flippedCards;
+                            
+                            if (card1.dataset.symbol === card2.dataset.symbol) {
+                                // 匹配成功
+                                setTimeout(() => {
+                                    card1.classList.add('matched');
+                                    card2.classList.add('matched');
+                                    flippedCards = [];
+                                    canFlip = true;
+                                    matchedPairs++;
+                                    this.updateScore(20);
+                                    
+                                    if (matchedPairs === symbols.length) {
+                                        const scoreBonus = Math.max(0, 200 - moves * 2);
+                                        this.updateScore(scoreBonus);
+                                        this.showGameOver('记忆挑战完成!');
+                                        this.gameActive = false;
+                                    }
+                                }, 500);
+                            } else {
+                                // 匹配失败
+                                setTimeout(() => {
+                                    card1.classList.remove('flipped');
+                                    card1.textContent = '';
+                                    card2.classList.remove('flipped');
+                                    card2.textContent = '';
+                                    flippedCards = [];
+                                    canFlip = true;
+                                }, 1000);
+                            }
+                        }
+                    };
+                    
+                    grid.appendChild(card);
+                });
+                
+                document.getElementById('game-start').onclick = () => {
+                    this.gameActive = true;
+                    this.gameScore = 0;
+                    this.updateScore(0);
+                    moves = 0;
+                    matchedPairs = 0;
+                    
+                    // 重置所有卡片
+                    const allCards = grid.querySelectorAll('.memory-card');
+                    allCards.forEach(card => {
+                        card.classList.remove('flipped', 'matched');
+                        card.textContent = '';
+                    });
+                    
+                    // 先展示所有卡片3秒
+                    allCards.forEach(card => {
+                        card.classList.add('flipped');
+                        card.textContent = card.dataset.symbol;
+                    });
+                    
+                    setTimeout(() => {
+                        allCards.forEach(card => {
+                            card.classList.remove('flipped');
+                            card.textContent = '';
+                        });
+                    }, 3000);
+                };
+                
+                document.getElementById('game-restart').onclick = () => {
+                    this.closeGame();
+                    this.openGame('memory');
+                };
+            }
+        }
+        
+        // ==================== 工具函数 ====================
+        function getMalaccaTime() {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            return new Date(utc + (3600000 * CONFIG.MALACCA_TIMEZONE));
+        }
+        
+        function formatTime(date) {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+        
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function formatDateTime(date) {
+            return `${formatDate(date)} ${formatTime(date)}`;
+        }
+        
+        function showMessage(message, duration = 3000) {
+            const popup = document.getElementById('message-popup');
+            popup.innerHTML = `<p>${message}</p>`;
+            popup.style.display = 'block';
+            
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, duration);
+        }
+        
+        // ==================== 主应用程序 ====================
+        class App {
+            constructor() {
+                this.isAdmin = false;
+                this.userBlessing = null;
+                this.onlineUsers = 25; // 初始在线人数
+                this.onlineUpdateInterval = null;
+                this.hasEnteredBefore = false; // 记录用户是否曾经进入过内页
+                
+                this.init();
+            }
+            
+            init() {
+                // 初始化动态壁纸
+                this.wallpaper = new DynamicWallpaper('background-canvas');
+                
+                // 初始化烟花系统
+                this.fireworks = new FireworksSystem('fireworks-canvas');
+                
+                // 初始化游戏系统
+                this.gameSystem = new GameSystem();
+                
+                // 从本地存储加载用户状态
+                this.loadUserState();
+                
+                // 设置事件监听器
+                this.setupEventListeners();
+                
+                // 启动时间更新
+                this.updateTime();
+                setInterval(() => this.updateTime(), 1000);
+                
+                // 启动在线人数更新（每5秒）
+                this.updateOnlineUsers();
+                this.onlineUpdateInterval = setInterval(() => this.updateOnlineUsers(), 5000);
+                
+                // 添加大量祝福消息
+                this.addBlessingMessages();
+                
+                // 检查是否自动进入内页
+                this.checkAutoEnterMainPage();
+                
+                // 更新管理员界面
+                this.updateAdminUI();
+                
+                console.log('🎉 跨年互动网页已加载完成！');
+            }
+            
+            loadUserState() {
+                // 加载管理员状态
+                const savedAdmin = localStorage.getItem('isAdmin');
+                if (savedAdmin === 'true') {
+                    this.isAdmin = true;
+                    console.log('管理员状态已恢复');
+                }
+                
+                // 加载祝福信息
+                const savedBlessing = localStorage.getItem('userBlessing');
+                if (savedBlessing) {
+                    try {
+                        this.userBlessing = JSON.parse(savedBlessing);
+                        console.log('祝福信息已加载');
+                    } catch (e) {
+                        console.error('加载祝福数据失败:', e);
+                    }
+                }
+                
+                // 加载进入状态
+                const savedEntered = localStorage.getItem('hasEnteredMainPage');
+                if (savedEntered === 'true') {
+                    this.hasEnteredBefore = true;
+                    console.log('用户之前已经进入过内页');
+                }
+            }
+            
+            saveUserState() {
+                // 保存管理员状态
+                localStorage.setItem('isAdmin', this.isAdmin.toString());
+                
+                // 保存祝福信息
+                if (this.userBlessing) {
+                    localStorage.setItem('userBlessing', JSON.stringify(this.userBlessing));
+                }
+                
+                // 保存进入状态
+                localStorage.setItem('hasEnteredMainPage', this.hasEnteredBefore.toString());
+            }
+            
+            checkAutoEnterMainPage() {
+                // 如果用户之前已经进入过内页，并且当前时间允许进入，则自动进入
+                if (this.hasEnteredBefore && this.canEnterMainPage()) {
+                    setTimeout(() => {
+                        this.enterMainPage();
+                        showMessage('欢迎回来！自动进入庆典主页面', 2000);
+                    }, 1000);
+                }
+            }
+            
+            setupEventListeners() {
+                // 祝福按钮 - 添加时间限制检查
+                document.getElementById('blessing-btn').addEventListener('click', () => {
+                    const now = getMalaccaTime();
+                    
+                    // 检查时间限制（非管理员用户）
+                    if (!this.isAdmin && !this.canSubmitBlessing()) {
+                        showMessage('⏰ 普通用户只能在跨年前1小时（12月31日23:00后）填写祝福！', 3000);
+                        return;
+                    }
+                    
+                    // 管理员不受限制
+                    document.getElementById('blessing-modal').style.display = 'flex';
+                    document.getElementById('submit-time').value = formatDateTime(getMalaccaTime());
+                    
+                    // 显示管理员提示
+                    if (this.isAdmin) {
+                        document.getElementById('admin-blessing-notice').style.display = 'block';
+                    } else {
+                        document.getElementById('admin-blessing-notice').style.display = 'none';
+                    }
+                    
+                    // 如果已有昵称，自动填充
+                    if (this.userBlessing) {
+                        document.getElementById('nickname').value = this.userBlessing.nickname;
                     }
                 });
-            } else {
-                handleWishesUpdate(JSON.parse(localStorage.getItem('local_wishes') || '[]'));
+                
+                // 提交祝福
+                document.getElementById('blessing-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const nickname = document.getElementById('nickname').value.trim();
+                    const thanks = document.getElementById('thanks').value.trim();
+                    const blessing = document.getElementById('blessing').value.trim();
+                    
+                    if (!nickname || !thanks || !blessing) {
+                        showMessage('请填写所有内容！', 2000);
+                        return;
+                    }
+                    
+                    if (nickname.length > 20) {
+                        showMessage('昵称不能超过20个字！', 2000);
+                        return;
+                    }
+                    
+                    const blessingData = {
+                        nickname,
+                        thanks,
+                        blessing,
+                        time: document.getElementById('submit-time').value
+                    };
+                    
+                    this.saveBlessing(blessingData);
+                    showMessage('🎊 祝福提交成功！', 2000);
+                    document.getElementById('blessing-modal').style.display = 'none';
+                    this.updateEntryButton();
+                });
+                
+                // 关闭祝福弹窗
+                document.getElementById('close-blessing-modal').addEventListener('click', () => {
+                    document.getElementById('blessing-modal').style.display = 'none';
+                });
+                
+                // 进入内页
+                document.getElementById('enter-main-btn').addEventListener('click', () => {
+                    if (!this.canEnterMainPage()) {
+                        showMessage('跨年前1小时（12月31日23:00后）才能进入主庆典页面！', 3000);
+                        return;
+                    }
+                    
+                    this.enterMainPage();
+                });
+                
+                // 管理员直接进入按钮
+                document.getElementById('admin-enter-now')?.addEventListener('click', () => {
+                    if (this.isAdmin) {
+                        this.enterMainPage();
+                        showMessage('🔓 管理员直接进入庆典主页面！', 2000);
+                    }
+                });
+                
+                // 管理员触发烟花按钮
+                document.getElementById('admin-trigger-fireworks')?.addEventListener('click', () => {
+                    if (this.isAdmin) {
+                        this.fireworks.triggerNameFireworks();
+                        showMessage('🎆 管理员触发名字烟花！', 2000);
+                    }
+                });
+                
+                // 管理员按钮
+                document.getElementById('admin-btn').addEventListener('click', () => {
+                    document.getElementById('admin-modal').style.display = 'flex';
+                });
+                
+                document.getElementById('main-admin-btn').addEventListener('click', () => {
+                    document.getElementById('admin-modal').style.display = 'flex';
+                });
+                
+                // 管理员验证
+                document.getElementById('admin-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const phrase = document.getElementById('admin-phrase').value;
+                    const code = document.getElementById('admin-code').value;
+                    const password = document.getElementById('admin-password').value;
+                    
+                    const messageDiv = document.getElementById('admin-message');
+                    
+                    if (phrase === CONFIG.ADMIN_CREDENTIALS.phrase &&
+                        code === CONFIG.ADMIN_CREDENTIALS.code &&
+                        password === CONFIG.ADMIN_CREDENTIALS.password) {
+                        
+                        this.isAdmin = true;
+                        this.saveUserState(); // 保存管理员状态
+                        
+                        messageDiv.textContent = '✅ 验证成功！管理员权限已激活。';
+                        messageDiv.style.color = '#10B981';
+                        messageDiv.style.background = 'rgba(16, 185, 129, 0.1)';
+                        messageDiv.style.border = '2px solid #10B981';
+                        
+                        setTimeout(() => {
+                            document.getElementById('admin-modal').style.display = 'none';
+                            messageDiv.textContent = '';
+                            messageDiv.style.background = '';
+                            messageDiv.style.border = '';
+                            
+                            // 更新管理员界面
+                            this.updateAdminUI();
+                            
+                            showMessage('🔓 管理员权限已激活！', 2000);
+                            this.updateEntryButton();
+                        }, 1500);
+                        
+                    } else {
+                        messageDiv.textContent = '❌ 验证失败，无权限访问管理员功能';
+                        messageDiv.style.color = '#DC2626';
+                        messageDiv.style.background = 'rgba(220, 38, 38, 0.1)';
+                        messageDiv.style.border = '2px solid #DC2626';
+                    }
+                });
+                
+                // 关闭管理员弹窗
+                document.getElementById('close-admin-modal').addEventListener('click', () => {
+                    document.getElementById('admin-modal').style.display = 'none';
+                    const messageDiv = document.getElementById('admin-message');
+                    messageDiv.textContent = '';
+                    messageDiv.style.background = '';
+                    messageDiv.style.border = '';
+                });
+                
+                // 关闭游戏弹窗
+                document.getElementById('close-game-modal').addEventListener('click', () => {
+                    this.gameSystem.closeGame();
+                });
+                
+                // 游戏控制按钮
+                document.getElementById('game-start').addEventListener('click', () => {
+                    // 游戏开始逻辑在各自的游戏初始化中处理
+                });
+                
+                document.getElementById('game-restart').addEventListener('click', () => {
+                    // 游戏重新开始逻辑在各自的游戏初始化中处理
+                });
+                
+                // 确认弹窗
+                document.getElementById('confirm-restart-no').addEventListener('click', () => {
+                    document.getElementById('confirm-modal').style.display = 'none';
+                });
+                
+                // 管理员特殊功能按钮
+                document.getElementById('admin-trigger-name-fireworks')?.addEventListener('click', () => {
+                    if (this.isAdmin) {
+                        this.fireworks.triggerNameFireworks();
+                        showMessage('🎆 管理员触发名字烟花！', 2000);
+                    }
+                });
+                
+                document.getElementById('admin-add-blessing')?.addEventListener('click', () => {
+                    if (this.isAdmin) {
+                        document.getElementById('blessing-modal').style.display = 'flex';
+                        document.getElementById('submit-time').value = formatDateTime(getMalaccaTime());
+                        document.getElementById('admin-blessing-notice').style.display = 'block';
+                    }
+                });
+                
+                document.getElementById('admin-reset-games')?.addEventListener('click', () => {
+                    if (this.isAdmin) {
+                        if (confirm('确定要重置所有游戏记录吗？')) {
+                            // 重置所有游戏记录
+                            for (const gameKey in this.gameSystem.games) {
+                                localStorage.removeItem(this.gameSystem.games[gameKey].bestScoreKey);
+                            }
+                            this.gameSystem.bestScores = this.gameSystem.loadBestScores();
+                            showMessage('✅ 所有游戏记录已重置！', 2000);
+                        }
+                    }
+                });
+                
+                document.getElementById('admin-simulate-newyear')?.addEventListener('click', () => {
+                    if (this.isAdmin) {
+                        // 模拟新年时刻
+                        this.fireworks.triggerNewYearFireworks();
+                        showMessage('🎉 模拟新年时刻！', 2000);
+                    }
+                });
+                
+                document.getElementById('trigger-fireworks-now')?.addEventListener('click', () => {
+                    if (this.isAdmin) {
+                        this.fireworks.triggerRandomFireworks(15);
+                        showMessage('🎆 立即燃放烟花！', 2000);
+                    }
+                });
+                
+                // 点击外部关闭弹窗
+                window.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
+                        e.target.style.display = 'none';
+                        const messageDiv = document.getElementById('admin-message');
+                        if (messageDiv) {
+                            messageDiv.textContent = '';
+                            messageDiv.style.background = '';
+                            messageDiv.style.border = '';
+                        }
+                    }
+                    
+                    if (e.target.id === 'confirm-modal') {
+                        document.getElementById('confirm-modal').style.display = 'none';
+                    }
+                    
+                    if (e.target.id === 'leaderboard-modal') {
+                        document.getElementById('leaderboard-modal').style.display = 'none';
+                    }
+                });
+                
+                // 页面关闭前保存状态
+                window.addEventListener('beforeunload', () => {
+                    this.saveUserState();
+                });
             }
-        };
-
-        const getMLKTime = () => new Date(new Date().getTime() + (new Date().getTimezoneOffset() * 60000) + (3600000 * 8));
-        const format = (date) => date.toLocaleTimeString('en-GB', { hour12: false });
-
-        const updateUI = () => {
-            const now = getMLKTime();
-            const target = new Date(2026, 0, 1, 0, 0, 0);
-            const diff = target - now;
-            document.getElementById('clock').innerText = format(now);
-            if (diff <= 0) {
-                document.getElementById('countdown-timer').innerText = "HAPPY NEW YEAR!";
-            } else {
-                const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-                document.getElementById('countdown-timer').innerText = `${String(d).padStart(2,'0')}d ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            
+            enterMainPage() {
+                document.getElementById('welcome-page').style.display = 'none';
+                document.getElementById('main-page').style.display = 'block';
+                
+                // 标记用户已经进入过内页
+                this.hasEnteredBefore = true;
+                this.saveUserState();
+                
+                // 更新管理员界面
+                this.updateAdminUI();
             }
-            const canEnter = isAdmin || (now.getMonth() === 11 && now.getDate() === 31 && now.getHours() >= 23);
-            document.getElementById('entrance-hint').innerText = canEnter ? "✨ 入口已开放" : `当前: ${format(now)} (23:00 开放)`;
-        };
-
-        window.toggleModal = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
-        window.toggleView = () => {
-            document.getElementById('landing-page').classList.add('hidden');
-            document.getElementById('main-page').classList.remove('hidden');
-        };
-
-        document.getElementById('btn-submit').onclick = async () => {
-            const name = document.getElementById('form-name').value;
-            const wishText = document.getElementById('form-wish').value;
-            const data = { nickname: name, wish: wishText, timestamp: Date.now(), timeLabel: format(getMLKTime()) };
-            if (useFirebase) { await addDoc(collection(getFirestore(), ...PUBLIC_PATH, 'wishes'), data); } 
-            else { 
-                const local = JSON.parse(localStorage.getItem('local_wishes') || '[]');
-                local.push(data);
-                localStorage.setItem('local_wishes', JSON.stringify(local));
-                handleWishesUpdate(local);
+            
+            updateTime() {
+                const now = getMalaccaTime();
+                const countdown = this.getCountdown();
+                
+                // 更新时间显示
+                document.getElementById('melaka-time-display').textContent = `马六甲 ${formatTime(now)}`;
+                document.getElementById('main-melaka-time').textContent = `马六甲 ${formatTime(now)}`;
+                document.getElementById('current-time-display').textContent = formatTime(now);
+                document.getElementById('current-date-display').textContent = formatDate(now);
+                
+                // 更新倒计时
+                if (countdown.isNewYear) {
+                    document.getElementById('countdown-display').textContent = '🎉 2026新年快乐！';
+                    document.getElementById('main-countdown').textContent = '🎉 2026新年快乐！';
+                } else {
+                    document.getElementById('countdown-display').textContent = 
+                        `${countdown.days}天 ${countdown.hours.toString().padStart(2, '0')}:${countdown.minutes.toString().padStart(2, '0')}:${countdown.seconds.toString().padStart(2, '0')}`;
+                    
+                    document.getElementById('main-countdown').textContent = 
+                        `${countdown.days}天 ${countdown.hours.toString().padStart(2, '0')}:${countdown.minutes.toString().padStart(2, '0')}:${countdown.seconds.toString().padStart(2, '0')}`;
+                }
+                
+                // 更新状态
+                if (countdown.isNewYear) {
+                    document.getElementById('celebration-status').textContent = '🎆 2026新年庆典';
+                } else if (countdown.days === 0 && countdown.hours < 1) {
+                    document.getElementById('celebration-status').textContent = '⏰ 倒计时最后1小时';
+                } else {
+                    document.getElementById('celebration-status').textContent = '🎊 进行中';
+                }
+                
+                this.updateEntryButton();
+                this.updateBlessingButton();
             }
-            toggleModal('wish-modal', false); toggleView();
-        };
-
-        document.getElementById('game-grid').innerHTML = ['🧱','🧩','🏮','🧧'].map(icon => `
-            <button class="bg-white/5 p-5 rounded-2xl flex flex-col items-center gap-2 hover:scale-105 transition-all">
-                <span class="text-3xl">${icon}</span>
-            </button>
-        `).join('');
-
-        setInterval(updateUI, 1000);
-        initialize();
+            
+            getCountdown() {
+                const now = getMalaccaTime();
+                const diff = CONFIG.NEW_YEAR_2026 - now;
+                
+                if (diff <= 0) {
+                    return { days: 0, hours: 0, minutes: 0, seconds: 0, isNewYear: true };
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                return { days, hours, minutes, seconds, isNewYear: false };
+            }
+            
+            canEnterMainPage() {
+                // 管理员可以无视时间限制
+                if (this.isAdmin) return true;
+                
+                return this.canSubmitBlessing();
+            }
+            
+            canSubmitBlessing() {
+                // 管理员可以无视时间限制
+                if (this.isAdmin) return true;
+                
+                const now = getMalaccaTime();
+                const year = now.getFullYear();
+                const month = now.getMonth(); // 0 = 一月
+                const day = now.getDate();
+                const hours = now.getHours();
+                
+                // 只有在2025年12月31日23:00后（跨年前1小时）才开放
+                return year === 2025 && month === 11 && day === 31 && hours >= 23;
+            }
+            
+            updateAdminUI() {
+                // 更新外页管理员界面
+                if (this.isAdmin) {
+                    // 显示管理员欢迎消息
+                    document.getElementById('admin-welcome-message').style.display = 'block';
+                    
+                    // 显示管理员快速访问按钮
+                    document.getElementById('admin-quick-access').style.display = 'block';
+                    
+                    // 显示倒计时旁边的管理员标志
+                    document.getElementById('admin-countdown-badge').style.display = 'block';
+                    
+                    // 内页管理员按钮
+                    document.getElementById('main-admin-btn').style.display = 'block';
+                    
+                    // 内页管理员控制面板
+                    document.getElementById('admin-control-panel').style.display = 'block';
+                    
+                    // 内页管理员状态指示器
+                    document.getElementById('admin-status-indicator').style.display = 'inline';
+                    
+                    // 内页烟花控制
+                    document.getElementById('admin-fireworks-control').style.display = 'block';
+                } else {
+                    // 隐藏所有管理员元素
+                    document.getElementById('admin-welcome-message').style.display = 'none';
+                    document.getElementById('admin-quick-access').style.display = 'none';
+                    document.getElementById('admin-countdown-badge').style.display = 'none';
+                    document.getElementById('main-admin-btn').style.display = 'none';
+                    document.getElementById('admin-control-panel').style.display = 'none';
+                    document.getElementById('admin-status-indicator').style.display = 'none';
+                    document.getElementById('admin-fireworks-control').style.display = 'none';
+                }
+            }
+            
+            updateBlessingButton() {
+                const blessingBtn = document.getElementById('blessing-btn');
+                
+                if (this.canSubmitBlessing()) {
+                    blessingBtn.disabled = false;
+                    blessingBtn.classList.remove('blessing-btn-disabled');
+                    
+                    if (this.isAdmin) {
+                        blessingBtn.innerHTML = '<i class="fas fa-crown"></i> 管理员填写祝福';
+                        blessingBtn.style.background = 'linear-gradient(135deg, #9B59B6, #8E44AD)';
+                    } else {
+                        blessingBtn.innerHTML = '<i class="fas fa-pen-fancy"></i> 填写祝福';
+                        blessingBtn.style.background = 'linear-gradient(135deg, var(--welcome-primary), #FF3366)';
+                    }
+                } else {
+                    blessingBtn.disabled = true;
+                    blessingBtn.classList.add('blessing-btn-disabled');
+                    
+                    const now = getMalaccaTime();
+                    
+                    // 计算距离12月31日23:00还有多久
+                    const targetDate = new Date('2025-12-31T23:00:00+08:00');
+                    const diff = targetDate - getMalaccaTime();
+                    
+                    if (diff > 0) {
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        if (days > 0) {
+                            blessingBtn.innerHTML = `<i class="fas fa-clock"></i> ${days}天后开放`;
+                        } else if (hours > 0) {
+                            blessingBtn.innerHTML = `<i class="fas fa-clock"></i> ${hours}小时后开放`;
+                        } else {
+                            blessingBtn.innerHTML = `<i class="fas fa-clock"></i> ${minutes}分钟后开放`;
+                        }
+                    } else {
+                        blessingBtn.innerHTML = '<i class="fas fa-pen-fancy"></i> 填写祝福';
+                    }
+                }
+            }
+            
+            updateEntryButton() {
+                const enterBtn = document.getElementById('enter-main-btn');
+                const timeNotice = document.getElementById('time-restriction-notice');
+                
+                // 如果用户有祝福记录或者之前已经进入过内页，显示进入按钮
+                if (this.userBlessing || this.hasEnteredBefore || this.isAdmin) {
+                    enterBtn.style.display = 'flex';
+                    
+                    if (this.canEnterMainPage()) {
+                        enterBtn.disabled = false;
+                        
+                        if (this.isAdmin) {
+                            enterBtn.innerHTML = '<i class="fas fa-crown"></i> 管理员进入';
+                            enterBtn.style.background = 'linear-gradient(135deg, #9B59B6, #8E44AD)';
+                        } else {
+                            enterBtn.innerHTML = '<i class="fas fa-door-open"></i> 进入庆典主页面';
+                            enterBtn.style.background = 'linear-gradient(135deg, var(--welcome-primary), #FF3366)';
+                        }
+                        
+                        timeNotice.style.display = 'none';
+                    } else {
+                        enterBtn.disabled = true;
+                        enterBtn.innerHTML = '<i class="fas fa-clock"></i> 等待进入时间';
+                        timeNotice.style.display = 'block';
+                        
+                        const now = getMalaccaTime();
+                        const targetDate = new Date('2025-12-31T23:00:00+08:00');
+                        const diff = targetDate - now;
+                        
+                        if (diff > 0) {
+                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                            
+                            let timeLeftText = '';
+                            if (days > 0) {
+                                timeLeftText = `${days}天${hours}小时`;
+                            } else if (hours > 0) {
+                                timeLeftText = `${hours}小时${minutes}分钟`;
+                            } else {
+                                timeLeftText = `${minutes}分钟`;
+                            }
+                            
+                            timeNotice.querySelector('small').innerHTML = 
+                                `当前时间：<span id="current-time-display">${formatTime(now)}</span> | 日期：<span id="current-date-display">${formatDate(now)}</span><br>
+                                距离开放还有 ${timeLeftText}`;
+                        }
+                    }
+                } else {
+                    enterBtn.style.display = 'none';
+                    timeNotice.style.display = 'block';
+                }
+                
+                this.updateBlessingButton();
+                this.updateAdminUI();
+            }
+            
+            updateOnlineUsers() {
+                // 模拟真实在线人数变化
+                const change = Math.floor(Math.random() * 5) - 2; // -2 到 +2 的变化
+                this.onlineUsers = Math.max(1, this.onlineUsers + change);
+                
+                // 更新时间段影响
+                const hour = getMalaccaTime().getHours();
+                let baseAdjustment = 0;
+                
+                if (hour >= 20 || hour < 2) {
+                    baseAdjustment = 15; // 晚上人多
+                } else if (hour >= 14 && hour < 20) {
+                    baseAdjustment = 10; // 下午人多
+                } else if (hour >= 8 && hour < 14) {
+                    baseAdjustment = 5; // 上午人中等
+                } else {
+                    baseAdjustment = -5; // 凌晨人少
+                }
+                
+                // 添加随机波动
+                const randomAdjustment = Math.floor(Math.random() * 10) - 5;
+                const finalCount = Math.max(5, this.onlineUsers + baseAdjustment + randomAdjustment);
+                
+                // 更新显示
+                document.getElementById('online-count').textContent = finalCount;
+                document.getElementById('live-online-count').textContent = finalCount;
+            }
+            
+            saveBlessing(blessing) {
+                this.userBlessing = blessing;
+                this.saveUserState();
+                this.addBlessingToWall(blessing);
+            }
+            
+            addBlessingMessages() {
+                // 添加配置中的祝福消息
+                CONFIG.BLESSING_MESSAGES.forEach(blessing => {
+                    this.addBlessingToWall(blessing);
+                });
+                
+                // 添加系统欢迎消息
+                const systemWelcome = {
+                    nickname: "🎊 系统欢迎",
+                    thanks: "欢迎来到2026跨年互动庆典",
+                    blessing: "在这里写下您的新年祝福，与朋友们一起迎接美好的2026年！",
+                    time: "2025-12-31 18:00:00"
+                };
+                this.addBlessingToWall(systemWelcome);
+            }
+            
+            addBlessingToWall(blessing) {
+                const wall = document.getElementById('blessing-wall');
+                const item = document.createElement('div');
+                item.className = 'blessing-item fade-in';
+                item.innerHTML = `
+                    <div class="blessing-header">
+                        <span class="blessing-name">🎊 ${blessing.nickname}</span>
+                        <span class="blessing-time">${blessing.time}</span>
+                    </div>
+                    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 10px; color: #FFD700;">
+                        <strong>🙏 感谢：</strong>${blessing.thanks}
+                    </p>
+                    <p style="font-size: 16px; line-height: 1.6; color: #4ECDC4;">
+                        <strong>✨ 祝福：</strong>${blessing.blessing}
+                    </p>
+                `;
+                wall.insertBefore(item, wall.firstChild);
+                
+                // 限制祝福墙显示数量
+                const items = wall.querySelectorAll('.blessing-item');
+                if (items.length > 20) {
+                    wall.removeChild(items[items.length - 1]);
+                }
+            }
+        }
+        
+        // ==================== 启动应用 ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化应用
+            window.app = new App();
+        });
+        
+        // 如果DOM已经加载完成
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(() => {
+                if (!window.app) {
+                    window.app = new App();
+                }
+            }, 100);
+        }
     </script>
 </body>
 </html>
